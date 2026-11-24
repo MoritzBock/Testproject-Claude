@@ -24,6 +24,9 @@ import { prop } from '../systems/tiled';
 import { WorldLabels, escapeHtml } from '../systems/WorldLabels';
 import { ZoneGates } from '../systems/ZoneGates';
 import { zoneAt, type ZoneRect } from '../zones';
+import { PaperDoll } from '../systems/PaperDoll';
+import { characterStore } from '../../core/character-store';
+import { DEFAULT_EQUIPMENT } from '@pixel/shared';
 
 interface PortalEntity {
   levelId: string;
@@ -55,6 +58,7 @@ export class HubScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
   private layers!: Record<'ground' | 'deco' | 'gates' | 'above', Phaser.Tilemaps.TilemapLayer>;
   private player!: Phaser.Physics.Arcade.Sprite;
+  private doll!: PaperDoll;
   private dir: Direction = 'down';
   private portals: PortalEntity[] = [];
   private npcs: NpcEntity[] = [];
@@ -110,6 +114,7 @@ export class HubScene extends Phaser.Scene {
     // --- wiring -------------------------------------------------------------
     this.cleanups.push(
       progressStore.subscribe(() => this.syncWorld(true)),
+      characterStore.subscribe((c) => c.appearance && this.doll.setAppearance(c.appearance)),
       settingsStore.subscribe(() => this.applySettings()),
       bus.on('startGame', () => this.startPlaying()),
       bus.on('toTitle', () => this.backToTitle()),
@@ -132,7 +137,7 @@ export class HubScene extends Phaser.Scene {
     }
 
     if (appState.get().screen === 'game') this.startPlaying();
-    else this.player.setVisible(false);
+    else this.doll.setVisible(false);
   }
 
   // -------------------------------------------------------------------------
@@ -159,8 +164,12 @@ export class HubScene extends Phaser.Scene {
 
   private createPlayer(): void {
     const spawn = this.objects('spawn')[0];
-    this.player = this.physics.add.sprite(spawn?.x ?? 100, spawn?.y ?? 100, 'player', 0);
-    this.player.setOrigin(0.5, 1);
+    const appearance = characterStore.get().appearance ?? {
+      skinTone: 0,
+      equipped: { ...DEFAULT_EQUIPMENT },
+    };
+    this.doll = new PaperDoll(this, spawn?.x ?? 100, spawn?.y ?? 100, appearance);
+    this.player = this.doll.body;
     // Small hitbox at the feet so the player can walk "behind" things naturally.
     this.player.body!.setSize(10, 6).setOffset(3, 18);
     this.player.setCollideWorldBounds(true);
@@ -294,7 +303,9 @@ export class HubScene extends Phaser.Scene {
 
   private startPlaying(): void {
     appState.set({ screen: 'game' });
-    this.player.setVisible(true);
+    const a = characterStore.get().appearance;
+    if (a) this.doll.setAppearance(a);
+    this.doll.setVisible(true);
     const cam = this.cameras.main;
     cam.startFollow(this.player, true, 0.2, 0.2);
     if (this.motionOk) cam.fadeIn(400);
@@ -303,7 +314,7 @@ export class HubScene extends Phaser.Scene {
 
   private backToTitle(): void {
     this.cameras.main.stopFollow();
-    this.player.setVisible(false);
+    this.doll.setVisible(false);
     (this.player.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
     appState.set({
       screen: 'title',
@@ -380,6 +391,7 @@ export class HubScene extends Phaser.Scene {
     if (st.overlay || st.dialog) {
       body.setVelocity(0, 0);
       this.player.anims.stop();
+      this.doll.sync(delta);
       if (st.dialog && !st.overlay && input.consume('interact')) this.advanceDialog();
       if (st.dialog && input.consume('pause')) appState.set({ dialog: null });
       this.labels.update();
@@ -388,6 +400,11 @@ export class HubScene extends Phaser.Scene {
 
     if (input.consume('pause')) {
       openOverlay('pause');
+      playSfx('ui');
+      return;
+    }
+    if (input.consume('wardrobe')) {
+      openOverlay('wardrobe');
       playSfx('ui');
       return;
     }
@@ -409,7 +426,7 @@ export class HubScene extends Phaser.Scene {
       this.player.anims.stop();
       this.player.setFrame(DIRECTIONS.indexOf(this.dir) * 4);
     }
-    this.player.setDepth(this.player.y);
+    this.doll.sync(delta);
 
     this.updateNearby(false);
     if (input.consume('interact')) this.interact();

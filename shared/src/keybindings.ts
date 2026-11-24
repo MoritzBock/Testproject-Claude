@@ -1,5 +1,16 @@
 /** Rebindable input actions. Codes are `KeyboardEvent.code` values (layout independent). */
-export const ACTIONS = ['up', 'down', 'left', 'right', 'interact', 'pause', 'map'] as const;
+export const ACTIONS = [
+  'up',
+  'down',
+  'left',
+  'right',
+  'interact',
+  'pause',
+  'map',
+  'wardrobe',
+  'emote',
+  'console',
+] as const;
 export type Action = (typeof ACTIONS)[number];
 
 /** Two slots per action: primary and secondary key. */
@@ -13,6 +24,9 @@ export const ACTION_LABELS: Record<Action, string> = {
   interact: 'Interagieren',
   pause: 'Pause / Menü',
   map: 'Weltkarte',
+  wardrobe: 'Garderobe / Inventar',
+  emote: 'Emotes',
+  console: 'Admin-Konsole (nur Lehrkräfte)',
 };
 
 export const DEFAULT_BINDINGS: Bindings = {
@@ -23,6 +37,9 @@ export const DEFAULT_BINDINGS: Bindings = {
   interact: ['KeyE', 'Space'],
   pause: ['Escape', 'KeyP'],
   map: ['KeyM', null],
+  wardrobe: ['KeyI', null],
+  emote: ['KeyQ', null],
+  console: ['Backquote', 'F2'],
 };
 
 export function cloneBindings(b: Bindings): Bindings {
@@ -116,6 +133,7 @@ const KEY_NAMES: Record<string, string> = {
   AltLeft: 'Alt',
   Tab: 'Tab',
   Backspace: 'Rücktaste',
+  Backquote: '^',
 };
 
 /** Human readable German key name for a `KeyboardEvent.code`. */

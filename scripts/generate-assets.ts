@@ -19,6 +19,7 @@ import {
   renderPortals,
 } from './assets/sprites.js';
 import { generateMap } from './assets/map.js';
+import { LAYER_KEYS, renderLayer } from './assets/layers.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..', 'client', 'public', 'assets');
 
@@ -33,6 +34,11 @@ writePng('tilesets/tiles.png', renderTileset().canvas);
 writePng('sprites/player.png', renderCharacterSheet([PLAYER_COLORS]));
 writePng('sprites/npcs.png', renderCharacterSheet(NPC_COLORS));
 writePng('sprites/portals.png', renderPortals());
+for (const key of LAYER_KEYS) writePng(`sprites/layers/${key}.png`, renderLayer(key));
+writeFileSync(
+  join(root, 'sprites', 'layers', 'layers.json'),
+  JSON.stringify({ frameWidth: 16, frameHeight: 24, layers: LAYER_KEYS }),
+);
 
 const mapFile = join(root, 'maps', 'hub.json');
 if (!existsSync(mapFile) || process.argv.includes('--map')) {

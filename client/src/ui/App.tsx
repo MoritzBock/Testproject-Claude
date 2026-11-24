@@ -18,6 +18,7 @@ import { TouchControls } from './TouchControls';
 import { WorldMap } from './WorldMap';
 import { bus } from '../core/bus';
 import { LoginScreen } from './Login';
+import { Wardrobe } from './Wardrobe';
 import { Onboarding } from './Onboarding';
 import './ui.css';
 
@@ -32,7 +33,9 @@ export function App() {
       if (!s.overlay) return;
       const b = getSettings().controls.bindings;
       const isPause = e.code === 'Escape' || b.pause.includes(e.code);
-      const isMap = s.overlay === 'map' && b.map.includes(e.code);
+      const isMap =
+        (s.overlay === 'map' && b.map.includes(e.code)) ||
+        (s.overlay === 'wardrobe' && b.wardrobe.includes(e.code));
       if (isPause || isMap) {
         e.preventDefault();
         if (s.overlay === 'level') bus.emit('levelClosed');
@@ -69,6 +72,7 @@ export function App() {
       {overlay === 'privacy' && <PrivacyInfo />}
       {overlay === 'credits' && <Credits />}
       {overlay === 'level' && <LevelPlaceholder />}
+      {overlay === 'wardrobe' && <Wardrobe />}
       <RotateHint />
     </>
   );

@@ -26,6 +26,18 @@ export const ICONS = {
   talk: svg(
     '<rect x="0" y="1" width="8" height="5" fill="currentColor"/><rect x="2" y="6" width="2" height="1" fill="currentColor"/><rect x="2" y="3" width="1" height="1" fill="#0008"/><rect x="4" y="3" width="1" height="1" fill="#0008"/><rect x="6" y="3" width="1" height="1" fill="#0008"/>',
   ),
+  hanger: svg(
+    '<rect x="3" y="0" width="2" height="1" fill="currentColor"/><rect x="4" y="1" width="1" height="2" fill="currentColor"/><path d="M4 3h1v1h1v1h1v1h1v1h-8v-1h1v-1h1v-1h1z" fill="currentColor"/><rect x="1" y="6" width="6" height="1" fill="#0006"/>',
+  ),
+  coin: svg(
+    '<rect x="2" y="0" width="4" height="1" fill="currentColor"/><rect x="1" y="1" width="6" height="6" fill="currentColor"/><rect x="2" y="7" width="4" height="1" fill="currentColor"/><rect x="3" y="2" width="2" height="4" fill="#0005"/>',
+  ),
+  trophy: svg(
+    '<rect x="1" y="0" width="6" height="4" fill="currentColor"/><rect x="0" y="1" width="1" height="2" fill="currentColor"/><rect x="7" y="1" width="1" height="2" fill="currentColor"/><rect x="3" y="4" width="2" height="2" fill="currentColor"/><rect x="2" y="6" width="4" height="2" fill="currentColor"/>',
+  ),
+  person: svg(
+    '<rect x="3" y="0" width="2" height="2" fill="currentColor"/><rect x="2" y="3" width="4" height="3" fill="currentColor"/><rect x="2" y="6" width="1" height="2" fill="currentColor"/><rect x="5" y="6" width="1" height="2" fill="currentColor"/>',
+  ),
 } as const;
 
 export type IconName = keyof typeof ICONS;

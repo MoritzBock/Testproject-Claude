@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { appState } from '../../core/app-state';
 import { DIRECTIONS, CHAR_H, CHAR_W, PORTAL_KINDS } from '../constants';
 import { tileColors } from '../systems/minimap';
+import { LAYER_KEYS, layerTexture } from '../doll';
+import { textureImages } from '../assets-registry';
 
 /** Loads all assets (local files only), creates animations, then starts the hub. */
 export class BootScene extends Phaser.Scene {
@@ -14,19 +16,25 @@ export class BootScene extends Phaser.Scene {
     this.load.setPath('assets/');
     this.load.image('tiles', 'tilesets/tiles.png');
     this.load.tilemapTiledJSON('hub', 'maps/hub.json');
-    this.load.spritesheet('player', 'sprites/player.png', {
-      frameWidth: CHAR_W,
-      frameHeight: CHAR_H,
-    });
     this.load.spritesheet('npcs', 'sprites/npcs.png', { frameWidth: CHAR_W, frameHeight: CHAR_H });
     this.load.spritesheet('portals', 'sprites/portals.png', { frameWidth: 32, frameHeight: 32 });
+    for (const key of LAYER_KEYS)
+      this.load.spritesheet(layerTexture(key), `sprites/layers/${key}.png`, {
+        frameWidth: CHAR_W,
+        frameHeight: CHAR_H,
+      });
   }
 
   create(): void {
+    for (const key of LAYER_KEYS)
+      textureImages.set(
+        layerTexture(key),
+        this.textures.get(layerTexture(key)).getSourceImage() as HTMLImageElement,
+      );
     DIRECTIONS.forEach((dir, row) => {
       this.anims.create({
         key: `player-walk-${dir}`,
-        frames: this.anims.generateFrameNumbers('player', {
+        frames: this.anims.generateFrameNumbers(layerTexture('body'), {
           frames: [0, 1, 2, 3].map((f) => row * 4 + f),
         }),
         frameRate: 8,

@@ -19,6 +19,7 @@ import { registerClassRoutes } from './modules/classes.js';
 import { registerMeRoutes } from './modules/me.js';
 import { registerPolicyRoutes } from './modules/policies.js';
 import { registerStaffRoutes } from './modules/staff.js';
+import { registerCharacterRoutes } from './modules/character.js';
 import { seedDemo, DEMO } from './dev-seed.js';
 
 export const VERSION = '0.2.0';
@@ -116,6 +117,7 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   registerPolicyRoutes(app, deps);
   registerClassRoutes(app, deps);
   registerStaffRoutes(app, deps);
+  registerCharacterRoutes(app, deps);
 
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/'))

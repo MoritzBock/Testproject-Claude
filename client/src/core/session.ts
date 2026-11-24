@@ -4,6 +4,7 @@ import { appState, notify } from './app-state';
 import { bus } from './bus';
 import { createStore } from './store';
 import { applySettingsToDocument, settingsStore } from './settings-store';
+import { loadCharacter } from './character-store';
 
 export interface PublicInfo {
   schoolName: string;
@@ -51,6 +52,7 @@ export async function loadAccountData(): Promise<void> {
   ]);
   applyServerSettings(settings);
   sessionStore.set({ policies });
+  await loadCharacter();
 }
 
 let applyingRemote = false;

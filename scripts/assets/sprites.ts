@@ -146,7 +146,7 @@ export interface CharacterColors {
   shoes: Color;
 }
 
-function template(dir: Dir, frame: number): string[] {
+export function template(dir: Dir, frame: number): string[] {
   const head = dir === 'down' ? HEAD_DOWN : dir === 'up' ? HEAD_UP : HEAD_LEFT;
   const body = dir === 'down' || dir === 'up' ? BODY_FRONT : BODY_SIDE;
   const legs = (dir === 'down' || dir === 'up' ? LEGS_FRONT : LEGS_SIDE)[frame]!;

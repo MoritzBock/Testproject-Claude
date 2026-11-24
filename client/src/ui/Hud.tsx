@@ -34,6 +34,13 @@ export function Hud() {
       <div class="hud hud-right">
         <button
           class="btn btn-icon"
+          onClick={() => (playSfx('ui'), openOverlay('wardrobe'))}
+          aria-label="Garderobe öffnen"
+        >
+          <Icon name="hanger" />
+        </button>
+        <button
+          class="btn btn-icon"
           onClick={() => (playSfx('ui'), openOverlay('map'))}
           aria-label="Weltkarte öffnen"
         >

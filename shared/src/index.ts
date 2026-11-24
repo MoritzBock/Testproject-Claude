@@ -5,3 +5,5 @@ export * from './settings.js';
 export * from './unlock.js';
 export * from './policy.js';
 export * from './auth-schemas.js';
+export * from './items.js';
+export * from './economy.js';
