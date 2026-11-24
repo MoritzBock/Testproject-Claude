@@ -1,7 +1,7 @@
 import type { LevelStatus, Missing } from '@pixel/shared';
 import { createStore } from './store';
 
-export type Screen = 'loading' | 'title' | 'game';
+export type Screen = 'loading' | 'title' | 'login' | 'onboarding' | 'game';
 export type Overlay = null | 'pause' | 'settings' | 'map' | 'privacy' | 'credits' | 'level';
 
 export interface PortalInfo {

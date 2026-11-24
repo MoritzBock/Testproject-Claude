@@ -17,6 +17,8 @@ import { SettingsPanel } from './SettingsPanel';
 import { TouchControls } from './TouchControls';
 import { WorldMap } from './WorldMap';
 import { bus } from '../core/bus';
+import { LoginScreen } from './Login';
+import { Onboarding } from './Onboarding';
 import './ui.css';
 
 export function App() {
@@ -48,6 +50,8 @@ export function App() {
     <>
       {screen === 'loading' && <Loading />}
       {screen === 'title' && !overlay && <TitleScreen />}
+      {screen === 'login' && !overlay && <LoginScreen />}
+      {screen === 'onboarding' && <Onboarding />}
       {screen === 'game' && (
         <>
           <Hud />

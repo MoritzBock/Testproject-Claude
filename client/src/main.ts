@@ -9,6 +9,7 @@ import { BootScene } from './game/scenes/BootScene';
 import { HubScene } from './game/scenes/HubScene';
 import { computeViewport } from './game/scale';
 import { App } from './ui/App';
+import { initSession } from './core/session';
 
 applySettingsToDocument(getSettings());
 
@@ -59,6 +60,7 @@ input.onUiBack = () => closeOverlay();
 input.attach();
 
 render(h(App, {}), document.getElementById('ui-root')!);
+void initSession();
 
 // Re-apply the viewport once the first scene is running (cameras exist then).
 let lastScreen = appState.get().screen;

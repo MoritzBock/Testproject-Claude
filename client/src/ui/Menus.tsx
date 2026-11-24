@@ -2,7 +2,9 @@ import { GAME } from '@pixel/shared';
 import { appState, closeOverlay, openOverlay, openSettings } from '../core/app-state';
 import { bus } from '../core/bus';
 import { useStore } from '../core/store';
+import { logout, proceed, sessionStore } from '../core/session';
 import { playSfx, unlockAudio } from '../audio/sfx';
+import { PrivacyText } from './PrivacyText';
 import { starString } from '../game/portal-status';
 import { Modal } from './Modal';
 
@@ -28,6 +30,7 @@ export function Loading() {
 }
 
 export function TitleScreen() {
+  const me = useStore(sessionStore, (s) => s.me);
   return (
     <div class="title-screen">
       <div class="title-card">
@@ -39,11 +42,17 @@ export function TitleScreen() {
             onClick={() => {
               unlockAudio();
               playSfx('confirm');
-              bus.emit('startGame');
+              if (me) void proceed();
+              else appState.set({ screen: 'login' });
             }}
           >
-            Spielen
+            {me ? `Weiterspielen als ${me.username}` : 'Anmelden'}
           </button>
+          {me && (
+            <button class="btn" onClick={() => void logout()}>
+              Abmelden
+            </button>
+          )}
           <button class="btn" onClick={() => openSettings()}>
             Einstellungen
           </button>
@@ -79,6 +88,10 @@ export function PauseMenu() {
         <button class="btn" onClick={() => bus.emit('toTitle')}>
           Zum Titelbildschirm
         </button>
+        <TeacherLink />
+        <button class="btn" onClick={() => void logout()}>
+          Abmelden
+        </button>
       </nav>
       <details class="demo-tools">
         <summary>Testwerkzeuge (nur Platzhalter bis M4)</summary>
@@ -98,29 +111,18 @@ export function PauseMenu() {
 export function PrivacyInfo() {
   return (
     <Modal title="Datenschutz" onClose={closeOverlay} wide>
-      <div class="prose">
-        <p>
-          <strong>Entwurf / Testversion (Meilenstein M1).</strong> Die vollständige
-          Datenschutzinformation nach Art. 13 DSGVO folgt mit der Anmeldung (M2) und wird vor der
-          ersten Nutzung angezeigt.
-        </p>
-        <h3>Was diese Testversion speichert</h3>
-        <ul>
-          <li>
-            Nur deine <strong>Einstellungen</strong> (Lautstärke, Tasten, Barrierefreiheit) – lokal
-            in deinem Browser. Sie werden nicht an einen Server gesendet.
-          </li>
-          <li>
-            Der Demo-Spielfortschritt liegt nur im Arbeitsspeicher und ist nach dem Neuladen weg.
-          </li>
-          <li>
-            Es gibt keine Cookies, kein Tracking, keine Werbung und keine Verbindung zu fremden
-            Diensten.
-          </li>
-        </ul>
-        <p class="note">{LEARNING_NOTE}</p>
-      </div>
+      <PrivacyText />
     </Modal>
+  );
+}
+
+function TeacherLink() {
+  const me = useStore(sessionStore, (s) => s.me);
+  if (me?.role !== 'teacher') return null;
+  return (
+    <a class="btn" href="/dashboard.html" target="_blank" rel="noopener">
+      Lehrkraft-Dashboard öffnen
+    </a>
   );
 }
 

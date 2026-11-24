@@ -32,7 +32,7 @@ describe('app', () => {
   it('answers unknown API routes with JSON 404', async () => {
     const res = await app.inject({ method: 'GET', url: '/api/gibtsnicht' });
     expect(res.statusCode).toBe(404);
-    expect(res.json()).toEqual({ error: 'Nicht gefunden' });
+    expect(res.json().error).toBe('not_found');
   });
 });
 

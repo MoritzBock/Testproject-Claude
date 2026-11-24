@@ -694,3 +694,78 @@ kbd {
     width: 6.5rem;
   }
 }
+
+/* --- forms / onboarding ------------------------------------------------------------ */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+  margin: 0.6rem 0;
+  font-weight: 600;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  font: inherit;
+  font-weight: 400;
+  color: var(--fg);
+  background: #0e1222;
+  border: 2px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 0.55rem 0.6rem;
+  min-height: 2.75rem;
+  user-select: text;
+}
+.form-field input:focus-visible {
+  border-color: var(--accent);
+}
+.check-line {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.6rem 0;
+  text-align: left;
+}
+.check-line input {
+  width: 1.3rem;
+  height: 1.3rem;
+  accent-color: var(--accent);
+}
+.login-card .btn-big,
+.onboarding-card .btn-big {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+.menu-row.center {
+  justify-content: center;
+}
+.onboarding-card {
+  text-align: left;
+  max-height: calc(100dvh - 1rem);
+  overflow-y: auto;
+}
+.onboarding-card h1 {
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+.onboarding-card.wide {
+  width: min(44rem, calc(100vw - 1rem));
+}
+.scroll-box {
+  max-height: 50dvh;
+  overflow-y: auto;
+  border: 2px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 0 0.75rem;
+  user-select: text;
+}
+.dev-note {
+  border-top: 1px dashed var(--panel-border);
+  padding-top: 0.5rem;
+}
+.title-screen,
+.title-card {
+  overflow-y: auto;
+}
