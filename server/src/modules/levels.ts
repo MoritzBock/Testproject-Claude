@@ -325,7 +325,7 @@ export function registerLevelRoutes(app: FastifyInstance, deps: Deps): void {
   app.post('/api/runs/:runId/finish', async (req): Promise<RunSummary> => {
     const u = requireReady(req, deps);
     const { runId } = req.params as { runId: string };
-    const { run, state, def } = loadRun(u, runId);
+    const { state, def } = loadRun(u, runId);
     const now = clock.now();
     const points = state.tasks.reduce((s, t) => s + t.points, 0);
     const maxPoints = def.tasks.reduce((s, t) => s + t.points, 0);
@@ -441,7 +441,7 @@ export function registerLevelRoutes(app: FastifyInstance, deps: Deps): void {
     level(body.levelId);
     db.transaction(() => {
       for (const t of body.targets) {
-        let info: { name?: string; classId?: string | null } = {};
+        let info: { name?: string; classId?: string | null };
         if (t.scopeType === 'user') {
           const s = assertTeacherOfStudent(deps, u.id, t.scopeId);
           info = { name: s.username, classId: s.classId };

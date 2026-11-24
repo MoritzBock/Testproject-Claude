@@ -1,4 +1,6 @@
+import type { FastifyInstance } from 'fastify';
 import { and, eq } from 'drizzle-orm';
+import { requireReady } from '../auth/guards.js';
 import type { Deps } from '../deps.js';
 import { transactions, wallets } from '../db/schema.js';
 import { HttpError } from '../lib/http-error.js';
@@ -59,9 +61,8 @@ export function verifyLedger(deps: Deps, userId: string): boolean {
   return sum === balance(deps, userId).balance;
 }
 
-export function registerWalletRoutes(app: import('fastify').FastifyInstance, deps: Deps): void {
+export function registerWalletRoutes(app: FastifyInstance, deps: Deps): void {
   app.get('/api/wallet', async (req) => {
-    const { requireReady } = await import('../auth/guards.js');
     const u = requireReady(req, deps);
     return balance(deps, u.id);
   });
