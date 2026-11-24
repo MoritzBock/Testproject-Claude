@@ -91,6 +91,30 @@ export function setPolicy(
   }
 }
 
+/** Users affected by a change on a scope (for live refresh). */
+export function affectedUsers(deps: Deps, scope: Scope): string[] | 'all' {
+  switch (scope.scopeType) {
+    case 'global':
+      return 'all';
+    case 'class':
+      return deps.db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.classId, scope.scopeId))
+        .all()
+        .map((r) => r.id);
+    case 'group':
+      return deps.db
+        .select({ id: groupMembers.userId })
+        .from(groupMembers)
+        .where(eq(groupMembers.groupId, scope.scopeId))
+        .all()
+        .map((r) => r.id);
+    case 'user':
+      return [scope.scopeId];
+  }
+}
+
 /** Checks that the actor may change policies for the given scope. */
 export function assertScopeAccess(
   deps: Deps,
@@ -167,6 +191,11 @@ export function registerPolicyRoutes(app: FastifyInstance, deps: Deps): void {
         );
       }
     });
+    const affected = resolved.map(({ t }) => affectedUsers(deps, t));
+    deps.presence?.refresh(affected.includes('all') ? 'all' : (affected as string[][]).flat(), [
+      'policies',
+      'world',
+    ]);
     return { ok: true, count: resolved.length };
   });
 }

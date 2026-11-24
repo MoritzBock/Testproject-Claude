@@ -36,6 +36,10 @@ export const SettingsSchema = z.object({
     colorblindMarkers: z.boolean(),
     subtitles: z.boolean(),
   }),
+  privacy: z.object({
+    /** Appear as "Anonym" in leaderboards. */
+    leaderboardAnonymous: z.boolean(),
+  }),
 });
 export type Settings = z.infer<typeof SettingsSchema> & {
   controls: { bindings: Bindings };
@@ -54,6 +58,7 @@ export function defaultSettings(opts: { prefersReducedMotion?: boolean } = {}): 
       colorblindMarkers: false,
       subtitles: false,
     },
+    privacy: { leaderboardAnonymous: false },
   };
 }
 
@@ -67,7 +72,9 @@ export function parseSettings(input: unknown, defaults: Settings = defaultSettin
   if (typeof input !== 'object' || input === null) return defaults;
   const raw = input as Record<string, unknown>;
   const shape = SettingsSchema.shape;
-  const pick = <K extends 'audio' | 'controls' | 'graphics' | 'a11y'>(key: K): Settings[K] => {
+  const pick = <K extends 'audio' | 'controls' | 'graphics' | 'a11y' | 'privacy'>(
+    key: K,
+  ): Settings[K] => {
     const r = shape[key].safeParse(raw[key]);
     return (r.success ? r.data : defaults[key]) as Settings[K];
   };
@@ -77,6 +84,7 @@ export function parseSettings(input: unknown, defaults: Settings = defaultSettin
     controls: pick('controls'),
     graphics: pick('graphics'),
     a11y: pick('a11y'),
+    privacy: pick('privacy'),
   };
 }
 

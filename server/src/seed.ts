@@ -15,6 +15,7 @@ if (cfg.NODE_ENV === 'production') {
 mkdirSync(cfg.DATA_DIR, { recursive: true });
 const { db, sqlite } = openDb(cfg.DB_FILE ?? join(cfg.DATA_DIR, 'pixel.db'));
 const deps = {
+  presence: undefined as never,
   db,
   sqlite,
   cfg,

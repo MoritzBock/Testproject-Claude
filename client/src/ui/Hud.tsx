@@ -3,6 +3,7 @@ import { formatCurrency, GAME, keyLabel } from '@pixel/shared';
 import { appState, openOverlay } from '../core/app-state';
 import { bus } from '../core/bus';
 import { settingsStore } from '../core/settings-store';
+import { sessionStore } from '../core/session';
 import { useStore } from '../core/store';
 import { input } from '../input/input';
 import { playSfx } from '../audio/sfx';
@@ -10,6 +11,39 @@ import { minimapCanvas } from '../game/systems/minimap';
 import { missingText } from '../game/data/world';
 import { STATUS, starString } from '../game/portal-status';
 import { Icon } from './Icon';
+
+function SocialButtons() {
+  const pol = useStore(sessionStore, (s) => s.policies);
+  const role = useStore(sessionStore, (s) => s.me?.role);
+  return (
+    <>
+      {role === 'teacher' && (
+        <button
+          class="btn btn-icon"
+          onClick={() => openOverlay('console')}
+          aria-label="Admin-Konsole öffnen"
+          title="Admin-Konsole (^ / F2)"
+        >
+          &gt;_
+        </button>
+      )}
+      {role === 'student' && pol?.['leaderboard.enabled'] && (
+        <button
+          class="btn btn-icon"
+          onClick={() => openOverlay('leaderboard')}
+          aria-label="Rangliste öffnen"
+        >
+          <Icon name="trophy" />
+        </button>
+      )}
+      {(role === 'teacher' || (pol?.['multiplayer.visible'] && pol['multiplayer.emotes'])) && (
+        <button class="btn btn-icon" onClick={() => openOverlay('emotes')} aria-label="Emotes">
+          <Icon name="talk" />
+        </button>
+      )}
+    </>
+  );
+}
 
 export function Hud() {
   const currency = useStore(appState, (s) => s.currency);
@@ -32,6 +66,7 @@ export function Hud() {
         </span>
       </div>
       <div class="hud hud-right">
+        <SocialButtons />
         <button
           class="btn btn-icon"
           onClick={() => (playSfx('ui'), openOverlay('wardrobe'))}

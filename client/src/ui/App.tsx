@@ -13,6 +13,7 @@ import { bus } from '../core/bus';
 import { LoginScreen } from './Login';
 import { Wardrobe } from './Wardrobe';
 import { Shop } from './Shop';
+import { AdminConsole, AnnouncementBanner, EmoteMenu, FrozenBanner, Leaderboard } from './Social';
 import { Onboarding } from './Onboarding';
 import './ui.css';
 
@@ -26,10 +27,15 @@ export function App() {
       const s = appState.get();
       if (!s.overlay) return;
       const b = getSettings().controls.bindings;
+      const t = e.target as HTMLElement | null;
+      const typing =
+        !!t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName));
+      if (typing && e.code !== 'Escape') return;
       const isPause = e.code === 'Escape' || b.pause.includes(e.code);
       const isMap =
         (s.overlay === 'map' && b.map.includes(e.code)) ||
-        (s.overlay === 'wardrobe' && b.wardrobe.includes(e.code));
+        (s.overlay === 'wardrobe' && b.wardrobe.includes(e.code)) ||
+        (s.overlay === 'emotes' && b.emote.includes(e.code));
       if (isPause || isMap) {
         e.preventDefault();
         if (s.overlay === 'level') bus.emit('levelClosed');
@@ -68,6 +74,19 @@ export function App() {
       {overlay === 'level' && <LevelView />}
       {overlay === 'wardrobe' && <Wardrobe />}
       {overlay === 'shop' && <Shop />}
+      {overlay === 'emotes' && <EmoteMenu />}
+      {overlay === 'leaderboard' && <Leaderboard />}
+      {overlay === 'console' && (
+        <AdminConsole
+          onAction={(a) => {
+            if (a.type === 'teleport' && a.x !== undefined && a.y !== undefined)
+              bus.emit('adminTeleport', { x: a.x, y: a.y });
+            if (a.type === 'invisible') bus.emit('adminInvisible', { on: !!a.on });
+          }}
+        />
+      )}
+      {screen === 'game' && <AnnouncementBanner />}
+      {screen === 'game' && <FrozenBanner />}
       <RotateHint />
     </>
   );

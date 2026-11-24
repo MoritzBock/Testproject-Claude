@@ -311,7 +311,10 @@ export function registerClassRoutes(app: FastifyInstance, deps: Deps): void {
       })
       .where(eq(users.id, id))
       .run();
-    if (body.status && body.status !== 'active') destroyUserSessions(deps, id);
+    if (body.status && body.status !== 'active') {
+      destroyUserSessions(deps, id);
+      deps.presence?.kick(id, 'Dein Konto wurde von deiner Lehrkraft gesperrt oder archiviert.');
+    }
     audit(deps, u, 'student.update', { userId: id, name: s.username, classId: s.classId }, body);
     return { ok: true };
   });
@@ -320,6 +323,7 @@ export function registerClassRoutes(app: FastifyInstance, deps: Deps): void {
     const u = requireRole(req, deps, 'teacher');
     const { id } = req.params as { id: string };
     const s = assertTeacherOfStudent(deps, u.id, id);
+    deps.presence?.kick(id, 'Dein Konto wurde gelöscht.');
     deleteUserCompletely(deps, id);
     audit(deps, u, 'student.delete', { classId: s.classId });
     return { ok: true };

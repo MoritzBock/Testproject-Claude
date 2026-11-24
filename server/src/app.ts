@@ -25,6 +25,11 @@ import { loadContent } from './content/loader.js';
 import { registerLevelRoutes } from './modules/levels.js';
 import { registerWalletRoutes } from './modules/wallet.js';
 import { registerEconomyRoutes } from './modules/economy.js';
+import { registerActivityRoutes } from './modules/activity.js';
+import { Presence } from './realtime/presence.js';
+import { registerConsoleRoutes } from './modules/console.js';
+import { registerDashboardRoutes } from './modules/dashboard.js';
+import { registerLeaderboardRoutes } from './modules/leaderboard.js';
 
 export const VERSION = '0.2.0';
 
@@ -54,7 +59,9 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   const { db, sqlite } = openDb(dbFile);
   const appKey = isTest ? Buffer.alloc(32, 7) : loadAppKey(cfg.DATA_DIR, cfg.APP_SECRET);
   const content = loadContent(cfg.CONTENT_DIR);
-  const deps: Deps = { db, sqlite, cfg, clock: opts.clock ?? systemClock, appKey, content };
+  const deps = { db, sqlite, cfg, clock: opts.clock ?? systemClock, appKey, content } as Deps;
+  deps.presence = new Presence(deps);
+  app.addHook('preClose', async () => deps.presence.close());
   app.decorate('deps', deps);
   app.addHook('onClose', async () => sqlite.close());
 
@@ -126,6 +133,10 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   registerLevelRoutes(app, deps);
   registerWalletRoutes(app, deps);
   registerEconomyRoutes(app, deps);
+  registerActivityRoutes(app, deps);
+  registerConsoleRoutes(app, deps);
+  registerDashboardRoutes(app, deps);
+  registerLeaderboardRoutes(app, deps);
 
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/'))
@@ -150,6 +161,8 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
       app.log.warn('CLIENT_DIST existiert nicht – Client wird nicht ausgeliefert.');
     }
   }
+
+  if (!isTest) deps.presence.attach(app);
 
   // --- first start ------------------------------------------------------------------
   if (cfg.NODE_ENV === 'development' && cfg.DEV_SEED && (await seedDemo(deps))) {

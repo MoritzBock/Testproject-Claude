@@ -16,6 +16,7 @@ import {
 import type { Deps } from '../deps.js';
 import {
   groups,
+  levelOverrides,
   levelProgress,
   levelRuns,
   rewardClaims,
@@ -37,7 +38,7 @@ import { getTaskType } from '../tasks/index.js';
 import { audit } from '../audit.js';
 import { checkAchievements } from './achievements.js';
 import { grantItem } from './character.js';
-import { effectivePolicies } from './policies.js';
+import { affectedUsers, effectivePolicies } from './policies.js';
 import { book } from './wallet.js';
 import { setLevelOverride, worldStateFor } from './world.js';
 
@@ -454,6 +455,8 @@ export function registerLevelRoutes(app: FastifyInstance, deps: Deps): void {
           info = { name: g.name };
         }
         setLevelOverride(deps, t, body.levelId, body.mode, u.id);
+        const affected = affectedUsers(deps, t);
+        deps.presence?.refresh(affected, ['world']);
         audit(
           deps,
           u,
@@ -472,6 +475,26 @@ export function registerLevelRoutes(app: FastifyInstance, deps: Deps): void {
       }
     });
     return { ok: true };
+  });
+
+  /** Current overrides of one scope (for the dashboard editor). */
+  app.get('/api/teacher/levels/overrides', async (req) => {
+    const u = requireRole(req, deps, 'teacher');
+    const q = parse(
+      z.object({ scopeType: z.enum(['user', 'group', 'class']), scopeId: z.string().max(64) }),
+      req.query,
+    );
+    if (q.scopeType === 'user') assertTeacherOfStudent(deps, u.id, q.scopeId);
+    else if (q.scopeType === 'class') assertTeacherOfClass(deps, u.id, q.scopeId);
+    else {
+      const g = db.select().from(groups).where(eq(groups.id, q.scopeId)).get();
+      if (!g || g.ownerId !== u.id) throw notFound('Gruppe');
+    }
+    return db
+      .select({ levelId: levelOverrides.levelId, mode: levelOverrides.mode })
+      .from(levelOverrides)
+      .where(and(eq(levelOverrides.scopeType, q.scopeType), eq(levelOverrides.scopeId, q.scopeId)))
+      .all();
   });
 
   /** Level list for the dashboard (metadata only, no solutions). */

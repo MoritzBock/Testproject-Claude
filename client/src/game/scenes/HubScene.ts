@@ -19,6 +19,9 @@ import { zoneAt, type ZoneRect } from '../zones';
 import { PaperDoll } from '../systems/PaperDoll';
 import { characterStore } from '../../core/character-store';
 import { DEFAULT_EQUIPMENT } from '@pixel/shared';
+import { RemotePlayers, makeAura } from '../systems/RemotePlayers';
+import { presenceStore, realtimeEvents, sendMove } from '../../net/realtime';
+import { sessionStore } from '../../core/session';
 
 interface PortalEntity {
   levelId: string;
@@ -53,6 +56,10 @@ export class HubScene extends Phaser.Scene {
   private layers!: Record<'ground' | 'deco' | 'gates' | 'above', Phaser.Tilemaps.TilemapLayer>;
   private player!: Phaser.Physics.Arcade.Sprite;
   private doll!: PaperDoll;
+  private remotes!: RemotePlayers;
+  private aura: Phaser.GameObjects.Ellipse | null = null;
+  private moveTimer = 0;
+  private worldLoaded = false;
   private dir: Direction = 'down';
   private portals: PortalEntity[] = [];
   private npcs: NpcEntity[] = [];
@@ -101,6 +108,8 @@ export class HubScene extends Phaser.Scene {
     cam.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     cam.setRoundPixels(true);
     this.labels = new WorldLabels(cam, this.game.canvas);
+    this.remotes = new RemotePlayers(this, this.labels);
+    realtimeEvents.onTeleport = (x, y) => this.player.setPosition(x, y);
 
     this.syncWorld(false);
     this.applySettings();
@@ -108,6 +117,7 @@ export class HubScene extends Phaser.Scene {
     // --- wiring -------------------------------------------------------------
     this.cleanups.push(
       worldStore.subscribe(() => this.syncWorld(true)),
+      presenceStore.subscribe((p) => this.remotes.sync(p.players)),
       characterStore.subscribe((c) => c.appearance && this.doll.setAppearance(c.appearance)),
       settingsStore.subscribe(() => this.applySettings()),
       bus.on('startGame', () => this.startPlaying()),
@@ -115,6 +125,8 @@ export class HubScene extends Phaser.Scene {
       bus.on('enterPortal', () => this.tryEnterNearbyPortal()),
       bus.on('interact', () => input.pressVirtual('interact')),
       bus.on('levelClosed', () => this.returnFromLevel()),
+      bus.on('adminTeleport', ({ x, y }) => this.player.setPosition(x, y)),
+      bus.on('adminInvisible', ({ on }) => this.doll.setAlpha(on ? 0.4 : 1)),
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.cleanups.forEach((fn) => fn());
@@ -233,8 +245,14 @@ export class HubScene extends Phaser.Scene {
     const zonesOpen = Object.fromEntries(
       Object.entries(this.world.zones).map(([k, v]) => [k, v.open]),
     );
-    const opened = this.gates.sync(zonesOpen, animate && !getSettings().a11y.reducedMotion);
-    for (const id of opened) {
+    // The first state after login only restores the world – no "newly unlocked" messages.
+    const firstLoad = !this.worldLoaded && !!worldStore.get().state;
+    if (worldStore.get().state) this.worldLoaded = true;
+    const opened = this.gates.sync(
+      zonesOpen,
+      animate && !firstLoad && !getSettings().a11y.reducedMotion,
+    );
+    for (const id of firstLoad ? [] : opened) {
       playSfx('unlock');
       notify(
         id === 'datenstrand'
@@ -320,6 +338,12 @@ export class HubScene extends Phaser.Scene {
     const a = characterStore.get().appearance;
     if (a) this.doll.setAppearance(a);
     this.doll.setVisible(true);
+    const isTeacher = sessionStore.get().me?.role === 'teacher';
+    if (isTeacher && !this.aura) this.aura = makeAura(this);
+    if (!isTeacher && this.aura) {
+      this.aura.destroy();
+      this.aura = null;
+    }
     const cam = this.cameras.main;
     cam.startFollow(this.player, true, 0.2, 0.2);
     if (this.motionOk) cam.fadeIn(400);
@@ -329,6 +353,10 @@ export class HubScene extends Phaser.Scene {
   private backToTitle(): void {
     this.cameras.main.stopFollow();
     this.doll.setVisible(false);
+    this.remotes.clear();
+    this.worldLoaded = false;
+    worldStore.set({ state: null });
+    this.aura?.setVisible(false);
     (this.player.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
     appState.set({
       screen: 'title',
@@ -416,8 +444,8 @@ export class HubScene extends Phaser.Scene {
       return;
     }
 
-    // movement
-    const v = input.move();
+    // movement (disabled while the teacher has frozen the class)
+    const v = st.frozen ? { x: 0, y: 0 } : input.move();
     body.setVelocity(v.x * PLAYER_SPEED, v.y * PLAYER_SPEED);
     const f = facing(v.x, v.y);
     if (f) {
@@ -430,7 +458,27 @@ export class HubScene extends Phaser.Scene {
     }
     this.doll.sync(delta);
 
+    this.remotes.update(delta);
+    if (this.aura)
+      this.aura
+        .setVisible(true)
+        .setPosition(this.player.x, this.player.y - 1)
+        .setDepth(this.player.y - 1);
+    this.moveTimer -= delta;
+    if (this.moveTimer <= 0) {
+      this.moveTimer = 100;
+      sendMove(this.player.x, this.player.y, Number(this.player.frame.name) || 0);
+    }
+    this.updateOwnLabel();
     this.updateNearby(false);
+    if (input.consume('emote')) {
+      openOverlay('emotes');
+      return;
+    }
+    if (input.consume('console') && sessionStore.get().me?.role === 'teacher') {
+      openOverlay('console');
+      return;
+    }
     if (input.consume('interact')) this.interact();
     this.updateZone();
     this.labels.update();
@@ -529,6 +577,24 @@ export class HubScene extends Phaser.Scene {
       playSfx('talk');
       appState.set({ dialog: { ...d, index: d.index + 1 } });
     } else appState.set({ dialog: null });
+  }
+
+  /** Own emote bubble and teacher badge above the player. */
+  private updateOwnLabel(): void {
+    const me = appState.get().myEmote;
+    const emote = me && Date.now() - me.at < 4000 ? me.text : null;
+    const teacher = sessionStore.get().me?.role === 'teacher';
+    if (!emote && !teacher) {
+      this.labels.remove('me');
+      return;
+    }
+    this.labels.set(
+      'me',
+      this.player.x,
+      this.player.y - 26,
+      `${teacher ? '<span class="teacher-badge">Lehrkraft</span>' : ''}${emote ? `<span class="emote-bubble">${escapeHtml(emote)}</span>` : ''}`,
+      'remote-label',
+    );
   }
 
   private updateZone(): void {

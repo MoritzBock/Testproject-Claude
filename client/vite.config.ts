@@ -23,5 +23,11 @@ export default defineConfig({
     target: 'es2022',
     sourcemap: false,
     chunkSizeWarningLimit: 1600, // Phaser alone is ~1.2 MB minified
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        dashboard: fileURLToPath(new URL('./dashboard.html', import.meta.url)),
+      },
+    },
   },
 });

@@ -20,12 +20,13 @@ import { useStore } from '../core/store';
 import { playSfx } from '../audio/sfx';
 import { Modal } from './Modal';
 
-type Tab = 'audio' | 'controls' | 'graphics' | 'a11y';
+type Tab = 'audio' | 'controls' | 'graphics' | 'a11y' | 'privacy';
 const TABS: Array<[Tab, string]> = [
   ['audio', 'Audio'],
   ['controls', 'Steuerung'],
   ['graphics', 'Grafik'],
   ['a11y', 'Barrierefreiheit'],
+  ['privacy', 'Privatsphäre'],
 ];
 
 export function SettingsPanel() {
@@ -51,6 +52,7 @@ export function SettingsPanel() {
         {tab === 'controls' && <ControlsTab s={s} />}
         {tab === 'graphics' && <GraphicsTab s={s} />}
         {tab === 'a11y' && <A11yTab s={s} />}
+        {tab === 'privacy' && <PrivacyTab s={s} />}
       </div>
       <div class="menu-row settings-footer">
         <button
@@ -353,6 +355,23 @@ function A11yTab({ s }: { s: Settings }) {
         checked={s.a11y.subtitles}
         onChange={(v) => updateSettings((x) => void (x.a11y.subtitles = v))}
       />
+    </>
+  );
+}
+
+function PrivacyTab({ s }: { s: Settings }) {
+  return (
+    <>
+      <Toggle
+        label="In Ranglisten anonym erscheinen"
+        hint="Andere sehen dann „Anonym“ statt deines Benutzernamens. Du selbst siehst deinen Platz trotzdem."
+        checked={s.privacy.leaderboardAnonymous}
+        onChange={(v) => updateSettings((x) => void (x.privacy.leaderboardAnonymous = v))}
+      />
+      <p class="note">
+        Welche Daten über dich gespeichert sind, siehst du im Menü unter „Meine Daten“. Dort kannst
+        du sie auch herunterladen.
+      </p>
     </>
   );
 }

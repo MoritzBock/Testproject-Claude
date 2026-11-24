@@ -14,7 +14,8 @@ export type Overlay =
   | 'shop'
   | 'mydata'
   | 'leaderboard'
-  | 'console';
+  | 'console'
+  | 'emotes';
 
 export interface PortalInfo {
   levelId: string;
@@ -58,6 +59,10 @@ export interface AppState {
   /** Player position in tiles (for minimap/world map). */
   playerTile: { x: number; y: number };
   touchActive: boolean;
+  frozen: boolean;
+  announcement: { text: string; from: string } | null;
+  /** Own emote (shown above the player). */
+  myEmote: { text: string; at: number } | null;
 }
 
 export const appState = createStore<AppState>({
@@ -77,6 +82,9 @@ export const appState = createStore<AppState>({
   minimapVersion: 0,
   playerTile: { x: 0, y: 0 },
   touchActive: false,
+  frozen: false,
+  announcement: null,
+  myEmote: null,
 });
 
 let toastId = 0;

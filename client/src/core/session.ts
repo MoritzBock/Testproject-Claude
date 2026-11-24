@@ -43,6 +43,8 @@ export async function proceed(): Promise<void> {
   await loadAccountData();
   appState.set({ overlay: null });
   bus.emit('startGame');
+  const { connectRealtime } = await import('../net/realtime');
+  connectRealtime();
 }
 
 /** Settings and feature switches of the account. */
@@ -93,6 +95,8 @@ export async function initSession(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
+  const { disconnectRealtime } = await import('../net/realtime');
+  disconnectRealtime();
   await post('/api/auth/logout').catch(() => {});
   sessionStore.set({ me: null, policies: null });
   bus.emit('toTitle');

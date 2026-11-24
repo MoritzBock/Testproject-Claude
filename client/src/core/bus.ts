@@ -6,6 +6,8 @@ export interface BusEvents {
   interact: void;
   settingsChanged: void;
   levelClosed: void;
+  adminTeleport: { x: number; y: number };
+  adminInvisible: { on: boolean };
 }
 
 type Handler<T> = (payload: T) => void;

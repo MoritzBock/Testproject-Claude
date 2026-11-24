@@ -3,6 +3,7 @@ import type { Config } from './config.js';
 import type { Db } from './db/client.js';
 import type { Clock } from './lib/clock.js';
 import type { Content } from './content/loader.js';
+import type { Presence } from './realtime/presence.js';
 
 /** Everything route modules need – passed explicitly (easy to fake in tests). */
 export interface Deps {
@@ -14,4 +15,6 @@ export interface Deps {
   appKey: Buffer;
   /** Validated level content (server/content). */
   content: Content;
+  /** Live presence (set after the app is built). */
+  presence: Presence;
 }
