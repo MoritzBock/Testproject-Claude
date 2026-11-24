@@ -1,0 +1,15 @@
+# Caddy obtains and renews a Let's Encrypt certificate for {$DOMAIN} automatically.
+# Access logs are intentionally NOT enabled (no IP addresses are stored).
+{
+	# Uncomment to use a certificate from the school instead of Let's Encrypt:
+	# auto_https off
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	reverse_proxy app:3000
+}

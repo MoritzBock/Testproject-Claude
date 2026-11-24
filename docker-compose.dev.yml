@@ -1,0 +1,16 @@
+# Local test of the production build without TLS:  docker compose -f docker-compose.dev.yml up --build
+# Then open http://localhost:3000 (Chrome/Edge/Firefox accept Secure cookies on localhost).
+
+services:
+  app:
+    build: .
+    environment:
+      NODE_ENV: production
+      PUBLIC_ORIGIN: http://localhost:3000
+    ports:
+      - '127.0.0.1:3000:3000'
+    volumes:
+      - dev-data:/data
+
+volumes:
+  dev-data:

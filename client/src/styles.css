@@ -1,0 +1,43 @@
+:root {
+  --bg: #0e1222;
+  --fg: #e8ecff;
+  --accent: #4fd1c5;
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --text-scale: 1;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-ui);
+  font-size: calc(16px * var(--text-scale));
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#game {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#game canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+#ui-root {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+#ui-root > * {
+  pointer-events: auto;
+}

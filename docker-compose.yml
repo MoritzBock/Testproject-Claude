@@ -1,0 +1,51 @@
+# Production: Caddy (TLS, HTTPS) in front of the app.
+# Usage: cp .env.example .env  →  edit DOMAIN / PUBLIC_ORIGIN  →  docker compose up -d --build
+
+x-logging:
+  &logging # Logs contain no personal data (see server/src/logger.ts); they are rotated by size.
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    volumes:
+      - app-data:/data
+    expose:
+      - '3000'
+    logging: *logging
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN muss in .env gesetzt sein}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    logging: *logging
+
+volumes:
+  app-data:
+  caddy-data:
+  caddy-config:
