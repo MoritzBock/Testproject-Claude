@@ -12,3 +12,4 @@ data/
 *.db-*
 backups/
 .DS_Store
+map-preview.png

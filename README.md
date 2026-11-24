@@ -6,7 +6,7 @@ Das System ist datensparsam gebaut (Pseudonyme statt Klarnamen, keine externen D
 
 > **Hinweis:** Die Lernstandsdaten dienen der Lernbegleitung und nicht der Notengebung.
 
-Stand: **Meilenstein M0 (Grundgerüst)**. Der Fahrplan steht in [`docs/PLAN.md`](docs/PLAN.md).
+Stand: **Meilenstein M1 (Hub-Welt)**. Der Fahrplan steht in [`docs/PLAN.md`](docs/PLAN.md).
 
 ---
 
@@ -40,6 +40,26 @@ npm run dev
 **Test am Handy oder iPad im selben WLAN:** Vite zeigt beim Start eine „Network“-Adresse an, z. B.
 `http://192.168.1.20:5173`. Diese Adresse im Gerät öffnen. Ab M2 ist dafür ggf. `COOKIE_SECURE=false`
 in `.env` nötig, weil das keine `localhost`-Adresse ist. Das gilt nur in der Entwicklung, in Produktion ist es gesperrt.
+
+### Steuerung (Standard, in den Einstellungen änderbar)
+
+| Aktion                         | Tastatur           | Gamepad                    | Touch                     |
+| ------------------------------ | ------------------ | -------------------------- | ------------------------- |
+| Laufen                         | WASD / Pfeiltasten | linker Stick / Steuerkreuz | Joystick links            |
+| Interagieren / Portal betreten | E / Leertaste      | A                          | Taste „A“                 |
+| Pause / Menü                   | Esc / P            | Start                      | Menü-Symbol               |
+| Weltkarte                      | M                  | Select                     | Karten-Symbol / Minikarte |
+
+### Assets und Karte
+
+Die Platzhalter-Grafiken und die Hub-Karte sind bereits im Repository. Neu erzeugen:
+
+```bash
+npm run assets
+```
+
+Die Karte (`hub.json`) wird dabei nur erzeugt, wenn sie fehlt. Details zur Bearbeitung mit Tiled und zum
+Austausch von Grafiken stehen in [`docs/KARTE_BEARBEITEN.md`](docs/KARTE_BEARBEITEN.md).
 
 ## 2. Lokal mit Docker testen
 
@@ -137,7 +157,7 @@ shared/   gemeinsame Typen, zod-Schemas, Spielkonstanten (Client + Server)
 server/   Fastify-API (Node 22, TypeScript)
 client/   Spiel (Phaser 3) + HTML-Overlays (Preact), gebaut mit Vite
 docs/     Plan, Anleitungen, Datenschutz-Entwürfe
-scripts/  Hilfsskripte (Assets, Backup)
+scripts/  Asset-Generator, Kartenvorschau, später Backup
 ```
 
 | Befehl              | Zweck                            |

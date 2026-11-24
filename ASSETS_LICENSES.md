@@ -9,9 +9,17 @@ Für jedes Asset, das nicht selbst erzeugt wurde, kommt hier ein Eintrag hinein.
 
 ## Programmatisch erzeugte Platzhalter
 
-Ab M1 erzeugt `scripts/generate-assets.ts` alle Platzhalter-Grafiken (Tilesets, Figuren, Portale, UI).
-Ab M8 kommen die Klänge per Web Audio dazu. Diese Inhalte entstehen vollständig im Projekt und
-enthalten keine fremden Werke.
+Folgende Dateien erzeugt `scripts/generate-assets.ts` vollständig im Projekt. Sie enthalten keine fremden
+Werke, Vorlagen oder Fremdgrafiken:
+
+- `client/public/assets/tilesets/tiles.png`: Kacheln der Bit-Insel
+- `client/public/assets/sprites/player.png`, `npcs.png`: Spielfigur und NPCs
+- `client/public/assets/sprites/portals.png`: Portale
+- `client/public/assets/maps/hub.json`: Hub-Karte (Tiled-Format)
+- UI-Symbole: `client/src/ui/icons.ts` (Inline-SVG)
+- Soundeffekte: zur Laufzeit per Web Audio synthetisiert (`client/src/audio/sfx.ts`)
+
+Schriften: Es werden keine Web-Fonts eingebunden. Die Oberfläche nutzt die Systemschrift des Geräts.
 
 ## Eigene oder CC0-Assets einbinden
 

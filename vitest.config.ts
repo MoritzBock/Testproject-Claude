@@ -17,6 +17,10 @@ export default defineConfig({
       },
       {
         extends: true,
+        test: { name: 'scripts', include: ['scripts/**/*.test.ts'], environment: 'node' },
+      },
+      {
+        extends: true,
         test: { name: 'client', include: ['client/src/**/*.test.ts'], environment: 'node' },
       },
     ],
