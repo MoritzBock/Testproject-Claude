@@ -6,7 +6,31 @@ Das System ist datensparsam gebaut (Pseudonyme statt Klarnamen, keine externen D
 
 > **Hinweis:** Die Lernstandsdaten dienen der Lernbegleitung und nicht der Notengebung.
 
-Stand: **Meilenstein M7 (Datenschutz-Abschluss)**. Der Fahrplan steht in [`docs/PLAN.md`](docs/PLAN.md).
+Stand: **alle Meilensteine M0–M8 umgesetzt** (Grundgerüst; Lerninhalte sind Platzhalter).
+Fahrplan: [`docs/PLAN.md`](docs/PLAN.md).
+
+## Was ist enthalten?
+
+- **Spiel:** Hub-Welt mit vier Zonen, Portalen zu Leveln, NPCs, Minikarte/Weltkarte, Paper-Doll-Charakter,
+  Garderobe, Shop (feste Angebote, optionale Lootboxen mit offenen Wahrscheinlichkeiten), Erfolge, Ranglisten
+  (optional), Emotes (kein freier Chat), Chiptune-Musik, Tastatur/Gamepad/Touch, Barrierefreiheit
+- **Lernen:** datengetriebene Level mit vier Aufgabentypen (Multiple Choice, Lückentext, Zuordnen per Drag & Drop,
+  Reihenfolge), serverseitige Auswertung, Hinweise, Sterne, Freischaltungsgraph
+- **Lehrkräfte:** Admin-Charakter in der Welt, Admin-Konsole, Dashboard mit Klassenverwaltung, Lernstand,
+  Auswertung, Export und Protokoll
+- **Datenschutz:** Pseudonyme, Argon2id, sichere Sitzungen, Rechteprüfung bei jeder Anfrage, automatische
+  Löschfristen, „Meine Daten“, Dokumentationsentwürfe
+
+## Dokumentation
+
+| Datei                                                        | Inhalt                                                                                          |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [`docs/LEVEL_ERSTELLEN.md`](docs/LEVEL_ERSTELLEN.md)         | Neue Level und Aufgabentypen anlegen                                                            |
+| [`docs/KARTE_BEARBEITEN.md`](docs/KARTE_BEARBEITEN.md)       | Hub-Karte mit Tiled bearbeiten, Grafiken austauschen                                            |
+| [`docs/ORACLE_ANLEITUNG.md`](docs/ORACLE_ANLEITUNG.md)       | Installation auf Oracle Cloud Schritt für Schritt                                               |
+| [`docs/datenschutz/`](docs/datenschutz/00_LIESMICH.md)       | Entwürfe: Datenübersicht, VVT, Datenschutzinformationen, Einwilligung, TOM, Betriebs-Checkliste |
+| [`docs/SECURITY_CHECKLISTE.md`](docs/SECURITY_CHECKLISTE.md) | Security-Review mit Ergebnissen                                                                 |
+| [`ASSETS_LICENSES.md`](ASSETS_LICENSES.md)                   | Herkunft und Lizenzen aller Assets                                                              |
 
 ---
 
@@ -35,11 +59,21 @@ npm run dev
 ```
 
 - Spiel: <http://localhost:5173>
-- API (über den Vite-Proxy): <http://localhost:5173/api/health>
+- Lehrkraft-Dashboard: <http://localhost:5173/dashboard.html>
+
+Beim ersten Start im Entwicklungsmodus werden **Demo-Konten** angelegt (Datenbank: `server/data/pixel.db`):
+
+| Rolle          | Anmeldung                                                                                                                         |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Lernende       | Klassencode `DEMO-01`, Benutzer `Pixelfuchs`, `Bitbiber`, `Datendachs`, `Kabeleule`, `Routerrabe`, Passwort `Schueler-Passwort-1` |
+| Lehrkraft      | „Ich bin Lehrkraft“ ankreuzen, `lehrkraft` / `Lehrkraft-Passwort-1`                                                               |
+| Administration | `admin` / `Admin-Passwort-1` (nur Dashboard)                                                                                      |
+
+Zurücksetzen auf einen frischen Stand: Server stoppen, Ordner `server/data` löschen, `npm run dev` neu starten.
 
 **Test am Handy oder iPad im selben WLAN:** Vite zeigt beim Start eine „Network“-Adresse an, z. B.
-`http://192.168.1.20:5173`. Diese Adresse im Gerät öffnen. Ab M2 ist dafür ggf. `COOKIE_SECURE=false`
-in `.env` nötig, weil das keine `localhost`-Adresse ist. Das gilt nur in der Entwicklung, in Produktion ist es gesperrt.
+`http://192.168.1.20:5173`. Weil das keine `localhost`-Adresse ist, in `.env` `COOKIE_SECURE=false` setzen
+(nur in der Entwicklung erlaubt, in Produktion gesperrt) und neu starten.
 
 ### Steuerung (Standard, in den Einstellungen änderbar)
 
@@ -49,6 +83,10 @@ in `.env` nötig, weil das keine `localhost`-Adresse ist. Das gilt nur in der En
 | Interagieren / Portal betreten | E / Leertaste      | A                          | Taste „A“                 |
 | Pause / Menü                   | Esc / P            | Start                      | Menü-Symbol               |
 | Weltkarte                      | M                  | Select                     | Karten-Symbol / Minikarte |
+| Garderobe                      | I                  | –                          | Kleiderbügel-Symbol       |
+| Emotes                         | Q (dann 1–6)       | –                          | Sprechblasen-Symbol       |
+| Admin-Konsole (Lehrkräfte)     | ^ oder F2          | –                          | „>_“-Symbol               |
+| Menüs                          | Tab / Enter / Esc  | Steuerkreuz, A, B          | Antippen                  |
 
 ### Assets und Karte
 
@@ -69,11 +107,13 @@ So testen Sie den Produktions-Build ohne TLS lokal:
 docker compose -f docker-compose.dev.yml up --build
 ```
 
-Danach <http://localhost:3000> öffnen. Die Daten liegen im Docker-Volume `dev-data`.
+Danach <http://localhost:3000/dashboard.html> öffnen. Der Produktions-Build legt **keine** Demo-Konten an:
+Das einmalige Setup-Token für das Administrationskonto steht im Log
+(`docker compose -f docker-compose.dev.yml logs app | grep Setup-Token`). Die Daten liegen im Docker-Volume `dev-data`.
 
 ## 3. Produktion (z. B. Oracle Cloud Free Tier)
 
-> Eine ausführliche Schritt-für-Schritt-Anleitung für Oracle folgt in M8. Vor dem Einsatz mit echten
+> Ausführliche Anleitung: [`docs/ORACLE_ANLEITUNG.md`](docs/ORACLE_ANLEITUNG.md). Vor dem Einsatz mit echten
 > Schülerdaten bitte die Datenschutz-Checkliste in `docs/datenschutz/` mit Schulleitung und DSB abarbeiten.
 
 Kurzfassung:

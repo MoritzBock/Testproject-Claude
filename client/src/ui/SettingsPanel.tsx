@@ -64,7 +64,7 @@ export function SettingsPanel() {
           Alles zurücksetzen
         </button>
         <span class="note">
-          Einstellungen werden derzeit nur in diesem Browser gespeichert (ab M2 an deinem Konto).
+          Nach der Anmeldung werden die Einstellungen an deinem Konto gespeichert.
         </span>
       </div>
     </Modal>
@@ -133,7 +133,7 @@ function AudioTab({ s }: { s: Settings }) {
         checked={s.audio.muted}
         onChange={(v) => updateSettings((x) => void (x.audio.muted = v))}
       />
-      <p class="note">Musik folgt in Meilenstein M8.</p>
+      <p class="note">Musik und Klänge werden im Spiel erzeugt (keine Audiodateien).</p>
     </>
   );
 }
@@ -254,7 +254,7 @@ function ControlsTab({ s }: { s: Settings }) {
       </label>
       <p class="note">
         Gamepad: linker Stick/Steuerkreuz bewegen, A interagieren, Start Pause, Select Weltkarte, B
-        zurück.
+        zurück. In Menüs bewegt das Steuerkreuz die Auswahl, A bestätigt.
       </p>
     </>
   );

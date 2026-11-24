@@ -4,7 +4,7 @@ import { getSettings } from '../core/settings-store';
 
 /**
  * Placeholder sound effects synthesised with Web Audio (no audio files, no licences needed).
- * Music follows in M8. Every effect has a caption for the subtitle setting.
+ * Music: see music.ts. Every effect has a caption for the subtitle setting.
  */
 export type Sfx = 'ui' | 'confirm' | 'deny' | 'portal' | 'talk' | 'unlock';
 
@@ -47,9 +47,15 @@ let captionTimer: ReturnType<typeof setTimeout> | undefined;
 
 /** Browsers (esp. iOS Safari) only allow audio after a user gesture. */
 export function unlockAudio(): void {
+  const fresh = !ctx;
   if (!ctx && typeof AudioContext !== 'undefined') ctx = new AudioContext();
   if (ctx?.state === 'suspended') void ctx.resume();
+  if (fresh && ctx) onUnlock.forEach((fn) => fn());
 }
+
+const onUnlock: Array<() => void> = [];
+export const onAudioUnlock = (fn: () => void) => onUnlock.push(fn);
+export const audioContext = (): AudioContext | null => ctx;
 
 export function playSfx(name: Sfx): void {
   const s = getSettings();

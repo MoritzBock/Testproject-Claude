@@ -1,7 +1,8 @@
 import { defaultSettings, parseSettings, type Settings } from '@pixel/shared';
 import { createStore } from './store';
 
-// Settings live in the browser only until M2; then they are stored per account.
+// Before login, settings are kept in this browser only (no personal data, no tokens);
+// after login they are loaded from and saved to the account (core/session.ts).
 // This storage holds no personal data and no tokens.
 const KEY = 'pixel-lernwelt.settings.v1';
 

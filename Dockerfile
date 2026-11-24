@@ -2,6 +2,8 @@
 # Multi-arch image (linux/amd64 + linux/arm64, e.g. Oracle Ampere).
 
 FROM node:22-bookworm-slim AS build
+# Build tools in case no prebuilt native binary (better-sqlite3) is available for the platform.
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY shared/package.json shared/
@@ -15,6 +17,7 @@ COPY client client
 RUN npm run build
 
 FROM node:22-bookworm-slim AS deps
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY shared/package.json shared/

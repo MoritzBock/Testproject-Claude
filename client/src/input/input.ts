@@ -12,6 +12,7 @@ class InputController {
   private pressed = new Set<Action>();
   private padPrev: boolean[] = [];
   private touchMove = { x: 0, y: 0 };
+  private navAt = 0;
   /** UI can block game input (e.g. while a menu is open). */
   blocked: () => boolean = () => false;
   /** Called for gamepad B/Start while the game input is blocked (close menus). */
@@ -62,6 +63,26 @@ class InputController {
     const edge = (i: number) => btn(i) && !this.padPrev[i];
     if (this.blocked()) {
       if (edge(1) || edge(9)) this.onUiBack();
+      // Menu navigation with the gamepad: D-pad / stick moves the focus, A activates.
+      const ax = pad.axes[0] ?? 0;
+      const ay = pad.axes[1] ?? 0;
+      const dir =
+        btn(12) || ay < -0.6
+          ? -1
+          : btn(13) || ay > 0.6
+            ? 1
+            : btn(14) || ax < -0.6
+              ? -1
+              : btn(15) || ax > 0.6
+                ? 1
+                : 0;
+      const now = performance.now();
+      if (dir !== 0 && now - this.navAt > 220) {
+        this.navAt = now;
+        moveFocus(dir);
+      }
+      if (dir === 0) this.navAt = 0;
+      if (edge(0)) (document.activeElement as HTMLElement | null)?.click();
     } else {
       if (edge(0)) this.pressed.add('interact');
       if (edge(9)) this.pressed.add('pause');
@@ -110,6 +131,21 @@ class InputController {
   pressVirtual(action: Action): void {
     if (!this.blocked()) this.pressed.add(action);
   }
+}
+
+/** Moves keyboard focus to the next/previous focusable control of the top-most dialog. */
+function moveFocus(dir: number): void {
+  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
+  const scope: ParentNode =
+    dialogs[dialogs.length - 1] ?? document.getElementById('ui-root') ?? document;
+  const items = [
+    ...scope.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), a[href], input:not([disabled]), select, [tabindex="0"]',
+    ),
+  ].filter((el) => el.offsetParent !== null);
+  if (!items.length) return;
+  const i = items.indexOf(document.activeElement as HTMLElement);
+  items[(i + dir + items.length) % items.length]?.focus();
 }
 
 function isTypingTarget(t: EventTarget | null): boolean {

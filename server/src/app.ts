@@ -33,7 +33,7 @@ import { registerLeaderboardRoutes } from './modules/leaderboard.js';
 import { registerPrivacyRoutes } from './modules/privacy.js';
 import { scheduleRetention } from './jobs/retention.js';
 
-export const VERSION = '0.2.0';
+export const VERSION = '0.9.0';
 
 declare module 'fastify' {
   interface FastifyInstance {

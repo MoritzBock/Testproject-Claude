@@ -19,6 +19,7 @@ import { zoneAt, type ZoneRect } from '../zones';
 import { PaperDoll } from '../systems/PaperDoll';
 import { characterStore } from '../../core/character-store';
 import { DEFAULT_EQUIPMENT } from '@pixel/shared';
+import { setMusicZone } from '../../audio/music-director';
 import { RemotePlayers, makeAura } from '../systems/RemotePlayers';
 import { presenceStore, realtimeEvents, sendMove } from '../../net/realtime';
 import { sessionStore } from '../../core/session';
@@ -605,6 +606,7 @@ export class HubScene extends Phaser.Scene {
     if (pt.x !== tx || pt.y !== ty) appState.set({ playerTile: { x: tx, y: ty } });
     if (z && z.id !== this.currentZone) {
       this.currentZone = z.id;
+      setMusicZone(z.id);
       appState.set({ zoneBanner: z.label });
       this.time.delayedCall(2500, () => {
         if (appState.get().zoneBanner === z.label) appState.set({ zoneBanner: null });
