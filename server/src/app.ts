@@ -21,6 +21,9 @@ import { registerPolicyRoutes } from './modules/policies.js';
 import { registerStaffRoutes } from './modules/staff.js';
 import { registerCharacterRoutes } from './modules/character.js';
 import { seedDemo, DEMO } from './dev-seed.js';
+import { loadContent } from './content/loader.js';
+import { registerLevelRoutes } from './modules/levels.js';
+import { registerWalletRoutes } from './modules/wallet.js';
 
 export const VERSION = '0.2.0';
 
@@ -49,7 +52,8 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   const dbFile = cfg.DB_FILE ?? (isTest ? ':memory:' : join(cfg.DATA_DIR, 'pixel.db'));
   const { db, sqlite } = openDb(dbFile);
   const appKey = isTest ? Buffer.alloc(32, 7) : loadAppKey(cfg.DATA_DIR, cfg.APP_SECRET);
-  const deps: Deps = { db, sqlite, cfg, clock: opts.clock ?? systemClock, appKey };
+  const content = loadContent(cfg.CONTENT_DIR);
+  const deps: Deps = { db, sqlite, cfg, clock: opts.clock ?? systemClock, appKey, content };
   app.decorate('deps', deps);
   app.addHook('onClose', async () => sqlite.close());
 
@@ -118,6 +122,8 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   registerClassRoutes(app, deps);
   registerStaffRoutes(app, deps);
   registerCharacterRoutes(app, deps);
+  registerLevelRoutes(app, deps);
+  registerWalletRoutes(app, deps);
 
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/'))

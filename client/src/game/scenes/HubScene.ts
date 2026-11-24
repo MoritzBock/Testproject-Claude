@@ -8,15 +8,7 @@ import { facing } from '../../input/move';
 import { playSfx } from '../../audio/sfx';
 import { ICONS } from '../../ui/icons';
 import { INTERACT_RANGE, PLAYER_SPEED, type Direction, DIRECTIONS } from '../constants';
-import {
-  ZONE_LABELS,
-  demoComplete,
-  demoStart,
-  levelMeta,
-  missingText,
-  progressStore,
-  worldState,
-} from '../data/demo-world';
+import { levelMetaOf, missingText, worldStore, zoneLabel } from '../data/world';
 import { STATUS, starString } from '../portal-status';
 import { AnimatedTiles } from '../systems/AnimatedTiles';
 import { renderMinimap } from '../systems/minimap';
@@ -53,6 +45,8 @@ export interface MapMarker {
 /** Portal positions in tiles – read by the world map overlay. */
 export const portalMarkers: MapMarker[] = [];
 export const zoneRects: ZoneRect[] = [];
+
+const EMPTY_WORLD: WorldState = { zones: {}, levels: {}, starsTotal: 0 };
 
 export class HubScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
@@ -113,15 +107,13 @@ export class HubScene extends Phaser.Scene {
 
     // --- wiring -------------------------------------------------------------
     this.cleanups.push(
-      progressStore.subscribe(() => this.syncWorld(true)),
+      worldStore.subscribe(() => this.syncWorld(true)),
       characterStore.subscribe((c) => c.appearance && this.doll.setAppearance(c.appearance)),
       settingsStore.subscribe(() => this.applySettings()),
       bus.on('startGame', () => this.startPlaying()),
       bus.on('toTitle', () => this.backToTitle()),
       bus.on('enterPortal', () => this.tryEnterNearbyPortal()),
       bus.on('interact', () => input.pressVirtual('interact')),
-      bus.on('demoCompleteLevel', ({ levelId, stars }) => this.finishDemoLevel(levelId, stars)),
-      bus.on('demoResetProgress', () => progressStore.set({ progress: {} })),
       bus.on('levelClosed', () => this.returnFromLevel()),
     );
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -180,10 +172,27 @@ export class HubScene extends Phaser.Scene {
   private createPortals(): void {
     portalMarkers.length = 0;
     for (const o of this.objects('portal')) {
-      const levelId = prop(o, 'levelId', o.name);
-      const kind = prop(o, 'kind', 'terminal');
-      const x = o.x ?? 0;
-      const y = o.y ?? 0;
+      this.addPortal(prop(o, 'levelId', o.name), prop(o, 'kind', 'terminal'), o.x ?? 0, o.y ?? 0);
+    }
+  }
+
+  /** Levels from the content files that define their own portal position (not in the map). */
+  private ensureLevelPortals(): void {
+    const known = new Set(worldStore.get().levels.map((l) => l.id));
+    for (const l of worldStore.get().levels) {
+      if (!l.portal || this.portals.some((p) => p.levelId === l.id)) continue;
+      this.addPortal(l.id, l.icon, (l.portal.x + 1) * 16, (l.portal.y + 1) * 16);
+    }
+    // Portals in the map whose level does not exist (yet) are hidden.
+    for (const p of this.portals) {
+      const exists = known.size === 0 || known.has(p.levelId);
+      p.sprite.setVisible(exists);
+      (p.sprite.body as Phaser.Physics.Arcade.StaticBody).enable = exists;
+    }
+  }
+
+  private addPortal(levelId: string, kind: string, x: number, y: number): void {
+    {
       const sprite = this.physics.add.staticSprite(x, y, 'portals', 0).setOrigin(0.5, 1);
       sprite.play(`portal-${kind}`);
       sprite.setDepth(y);
@@ -219,7 +228,8 @@ export class HubScene extends Phaser.Scene {
   // -------------------------------------------------------------------------
 
   private syncWorld(animate: boolean): void {
-    this.world = worldState();
+    this.world = worldStore.get().state ?? EMPTY_WORLD;
+    this.ensureLevelPortals();
     const zonesOpen = Object.fromEntries(
       Object.entries(this.world.zones).map(([k, v]) => [k, v.open]),
     );
@@ -231,7 +241,7 @@ export class HubScene extends Phaser.Scene {
           ? 'Die Brücke zum Datenstrand ist fertig!'
           : id === 'serverberg'
             ? 'Die Firewall zum Serverberg ist offen!'
-            : `${ZONE_LABELS[id] ?? id} ist jetzt erreichbar!`,
+            : `${zoneLabel(id)} ist jetzt erreichbar!`,
         'success',
         6000,
       );
@@ -253,13 +263,13 @@ export class HubScene extends Phaser.Scene {
   }
 
   private portalInfo(levelId: string): PortalInfo {
-    const meta = levelMeta(levelId);
+    const meta = levelMetaOf(levelId);
     const st = this.world.levels[levelId] ?? { status: 'locked' as const, stars: 0, missing: [] };
     return {
       levelId,
-      title: meta.title,
-      subject: meta.subject,
-      description: meta.description,
+      title: meta?.title ?? levelId,
+      subject: meta?.subject ?? '',
+      description: meta?.description ?? '',
       ...st,
     };
   }
@@ -267,6 +277,10 @@ export class HubScene extends Phaser.Scene {
   private refreshPortalLabels(): void {
     const effects = getSettings().graphics.effects && !getSettings().a11y.reducedMotion;
     for (const p of this.portals) {
+      if (!p.sprite.visible) {
+        this.labels.remove(`portal-${p.levelId}`);
+        continue;
+      }
       const info = this.portalInfo(p.levelId);
       const st = STATUS[info.status];
       const stars =
@@ -343,7 +357,6 @@ export class HubScene extends Phaser.Scene {
       return;
     }
     playSfx('portal');
-    demoStart(p.levelId);
     const open = () => {
       appState.set({ activeLevel: this.portalInfo(p.levelId) });
       openOverlay('level');
@@ -358,17 +371,6 @@ export class HubScene extends Phaser.Scene {
     appState.set({ activeLevel: null });
     if (this.motionOk) this.cameras.main.fadeIn(300, 14, 18, 34);
     else this.cameras.main.resetFX();
-  }
-
-  private finishDemoLevel(levelId: string, stars: number): void {
-    const { newStars } = demoComplete(levelId, stars);
-    playSfx('confirm');
-    notify(
-      newStars > 0
-        ? `Level abgeschlossen: +${newStars} ${newStars === 1 ? 'Stern' : 'Sterne'}`
-        : 'Level erneut abgeschlossen – keine zusätzliche Belohnung.',
-      'success',
-    );
   }
 
   // -------------------------------------------------------------------------
@@ -453,6 +455,7 @@ export class HubScene extends Phaser.Scene {
     let best: PortalEntity | null = null;
     let bestD = INTERACT_RANGE;
     for (const p of this.portals) {
+      if (!p.sprite.visible) continue;
       const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, p.x, p.y);
       if (d < bestD) {
         best = p;

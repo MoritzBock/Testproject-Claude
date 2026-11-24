@@ -9,6 +9,7 @@ import { BootScene } from './game/scenes/BootScene';
 import { HubScene } from './game/scenes/HubScene';
 import { computeViewport } from './game/scale';
 import { App } from './ui/App';
+import './tasks';
 import { initSession } from './core/session';
 
 applySettingsToDocument(getSettings());

@@ -13,6 +13,8 @@ const EnvSchema = z.object({
   /** ':memory:' for tests, otherwise a file inside DATA_DIR. */
   DB_FILE: z.string().optional(),
   CLIENT_DIST: z.string().optional(),
+  /** Directory with world.json and levels/*.json (default: server/content). */
+  CONTENT_DIR: z.string().optional(),
   COOKIE_SECURE: bool.default(true),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 

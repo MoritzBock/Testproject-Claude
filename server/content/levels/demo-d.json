@@ -1,0 +1,32 @@
+{
+  "id": "demo-d",
+  "title": "Demo D: Datenschutz-Quiz",
+  "subject": "Platzhalter · Datenschutz",
+  "description": "Platzhalter-Level am Datenstrand (erreichbar ab 3 Sternen).",
+  "icon": "frame",
+  "requires": { "zone": "datenstrand" },
+  "tasks": [
+    {
+      "id": "pbd",
+      "type": "choice",
+      "prompt": "Welche Angaben sind personenbezogene Daten?",
+      "options": [
+        { "text": "Name und Anschrift", "correct": true },
+        { "text": "IP-Adresse eines Rechners einer Person", "correct": true },
+        { "text": "Die Farbe eines Firmenlogos" },
+        { "text": "Durchschnittstemperatur in Bayern" }
+      ],
+      "explanation": "Personenbezogen ist alles, was sich einer Person zuordnen lässt – auch IP-Adressen."
+    },
+    {
+      "id": "begriffe",
+      "type": "match",
+      "prompt": "Ordne die Begriffe zu.",
+      "pairs": [
+        { "left": "Pseudonymisierung", "right": "Name wird durch Kennung ersetzt" },
+        { "left": "Datenminimierung", "right": "Nur so viele Daten wie nötig" },
+        { "left": "Verschlüsselung", "right": "Daten für Unbefugte unlesbar machen" }
+      ]
+    }
+  ]
+}

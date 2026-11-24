@@ -1,0 +1,54 @@
+{
+  "id": "demo-a",
+  "title": "Demo A: IT-Grundlagen",
+  "subject": "Platzhalter · IT-Systeme",
+  "description": "Platzhalter-Level mit Beispielaufgaben aller vier Aufgabentypen. Start der Kette A → B → C.",
+  "icon": "terminal",
+  "stars": [0.5, 0.75, 0.95],
+  "rewards": { "currencyPerStar": 15, "completionBonus": 20 },
+  "tasks": [
+    {
+      "id": "byte",
+      "type": "choice",
+      "prompt": "Aus wie vielen Bit besteht ein Byte?",
+      "options": [
+        { "text": "4 Bit" },
+        { "text": "8 Bit", "correct": true },
+        { "text": "16 Bit" },
+        { "text": "1024 Bit" }
+      ],
+      "hints": ["Ein Byte kann 256 verschiedene Werte darstellen."],
+      "feedback": { "correct": "Genau!", "wrong": "Leider nicht." },
+      "explanation": "1 Byte = 8 Bit, also 2⁸ = 256 mögliche Werte."
+    },
+    {
+      "id": "eingabe",
+      "type": "choice",
+      "prompt": "Welche Geräte sind Eingabegeräte? (Mehrere Antworten möglich)",
+      "options": [
+        { "text": "Tastatur", "correct": true },
+        { "text": "Monitor" },
+        { "text": "Scanner", "correct": true },
+        { "text": "Drucker" }
+      ],
+      "hints": ["Eingabegeräte senden Daten an den Computer."],
+      "explanation": "Tastatur und Scanner liefern Daten an den Computer; Monitor und Drucker geben Daten aus."
+    },
+    {
+      "id": "kib",
+      "type": "cloze",
+      "prompt": "Ergänze die Lücke.",
+      "text": "1 KiB (Kibibyte) sind {{kib}} Byte.",
+      "gaps": { "kib": { "accepted": ["1024", "1.024"] } },
+      "hints": ["Binärpräfix: 2 hoch 10."],
+      "explanation": "Kibi = 2¹⁰ = 1024. Das dezimale Kilobyte (kB) sind dagegen 1000 Byte."
+    },
+    {
+      "id": "eva",
+      "type": "order",
+      "prompt": "Bringe die Schritte des EVA-Prinzips in die richtige Reihenfolge.",
+      "items": ["Eingabe", "Verarbeitung", "Ausgabe"],
+      "explanation": "EVA: Eingabe – Verarbeitung – Ausgabe."
+    }
+  ]
+}

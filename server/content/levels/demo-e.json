@@ -1,0 +1,43 @@
+{
+  "id": "demo-e",
+  "title": "Demo E: Serverraum",
+  "subject": "Platzhalter · Hardware",
+  "description": "Platzhalter-Level auf dem Serverberg (nach A, B und C).",
+  "icon": "rack",
+  "requires": { "zone": "serverberg" },
+  "rewards": { "currencyPerStar": 25, "completionBonus": 40 },
+  "tasks": [
+    {
+      "id": "boot",
+      "type": "order",
+      "prompt": "In welcher Reihenfolge läuft ein PC-Start ab?",
+      "items": [
+        "Netzteil liefert Strom",
+        "UEFI/BIOS führt POST aus",
+        "Bootloader wird geladen",
+        "Betriebssystem startet"
+      ],
+      "explanation": "Strom → POST → Bootloader → Betriebssystem."
+    },
+    {
+      "id": "raid",
+      "type": "choice",
+      "prompt": "Welches RAID-Level spiegelt Daten auf zwei Festplatten?",
+      "options": [
+        { "text": "RAID 0" },
+        { "text": "RAID 1", "correct": true },
+        { "text": "RAID 5" }
+      ],
+      "hints": ["Spiegelung = engl. mirroring"],
+      "explanation": "RAID 1 spiegelt; RAID 0 verteilt ohne Redundanz."
+    },
+    {
+      "id": "usv",
+      "type": "cloze",
+      "prompt": "Ergänze.",
+      "text": "Eine {{u}} überbrückt kurze Stromausfälle.",
+      "gaps": { "u": { "accepted": ["USV", "unterbrechungsfreie Stromversorgung"] } },
+      "explanation": "USV = unterbrechungsfreie Stromversorgung."
+    }
+  ]
+}

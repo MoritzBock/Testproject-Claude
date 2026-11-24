@@ -1,0 +1,33 @@
+{
+  "id": "demo-c",
+  "title": "Demo C: Zahlensysteme",
+  "subject": "Platzhalter · Informationstechnik",
+  "description": "Platzhalter-Level. Wird nach Demo B freigeschaltet.",
+  "icon": "frame",
+  "requires": { "level": "demo-b" },
+  "tasks": [
+    {
+      "id": "bin",
+      "type": "cloze",
+      "prompt": "Rechne um.",
+      "text": "Die Binärzahl 1010 entspricht dezimal {{d}}.",
+      "gaps": { "d": { "accepted": ["10"] } },
+      "hints": ["1010 = 1·8 + 0·4 + 1·2 + 0·1"],
+      "explanation": "8 + 2 = 10."
+    },
+    {
+      "id": "hex",
+      "type": "choice",
+      "prompt": "Welchen Dezimalwert hat die Hexadezimalziffer F?",
+      "options": [{ "text": "14" }, { "text": "15", "correct": true }, { "text": "16" }],
+      "explanation": "A=10, B=11, …, F=15."
+    },
+    {
+      "id": "units",
+      "type": "order",
+      "prompt": "Sortiere aufsteigend nach Größe.",
+      "items": ["Bit", "Byte", "KiB", "MiB", "GiB"],
+      "explanation": "Bit < Byte < KiB < MiB < GiB."
+    }
+  ]
+}

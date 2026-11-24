@@ -5,7 +5,6 @@ import { useStore } from '../core/store';
 import { logout, proceed, sessionStore } from '../core/session';
 import { playSfx, unlockAudio } from '../audio/sfx';
 import { PrivacyText } from './PrivacyText';
-import { starString } from '../game/portal-status';
 import { Modal } from './Modal';
 
 export const LEARNING_NOTE =
@@ -93,16 +92,6 @@ export function PauseMenu() {
           Abmelden
         </button>
       </nav>
-      <details class="demo-tools">
-        <summary>Testwerkzeuge (nur Platzhalter bis M4)</summary>
-        <p>
-          Der Spielfortschritt wird derzeit nur im Arbeitsspeicher gehalten und beim Neuladen
-          verworfen.
-        </p>
-        <button class="btn" onClick={() => (bus.emit('demoResetProgress'), closeOverlay())}>
-          Demo-Fortschritt zurücksetzen
-        </button>
-      </details>
       <p class="note">{LEARNING_NOTE}</p>
     </Modal>
   );
@@ -143,48 +132,6 @@ export function Credits() {
           <li>Phaser 3 – MIT-Lizenz</li>
           <li>Preact – MIT-Lizenz</li>
         </ul>
-      </div>
-    </Modal>
-  );
-}
-
-/** PLACEHOLDER until M4: stands in for the real level view. */
-export function LevelPlaceholder() {
-  const level = useStore(appState, (s) => s.activeLevel);
-  const close = () => {
-    closeOverlay();
-    bus.emit('levelClosed');
-  };
-  if (!level) return null;
-  return (
-    <Modal title={level.title} onClose={close} wide>
-      <div class="prose">
-        <p>{level.description}</p>
-        <p class="hint-box">
-          Hier erscheinen ab Meilenstein M4 die Aufgaben dieses Levels. Zum Testen der Freischaltung
-          kannst du das Level jetzt mit einer Demo-Wertung abschließen.
-        </p>
-        <p>
-          Bisher erreicht:{' '}
-          <span aria-label={starString(level.stars).text}>{starString(level.stars).visual}</span>
-        </p>
-        <div class="menu-row">
-          {[1, 2, 3].map((n) => (
-            <button
-              key={n}
-              class="btn"
-              onClick={() => {
-                bus.emit('demoCompleteLevel', { levelId: level.levelId, stars: n });
-                close();
-              }}
-            >
-              Abschließen mit {starString(n).visual}
-            </button>
-          ))}
-        </div>
-        <button class="btn btn-primary" onClick={close}>
-          Zurück zur Insel
-        </button>
       </div>
     </Modal>
   );

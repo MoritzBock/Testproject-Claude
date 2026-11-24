@@ -7,7 +7,7 @@ import { useStore } from '../core/store';
 import { input } from '../input/input';
 import { playSfx } from '../audio/sfx';
 import { minimapCanvas } from '../game/systems/minimap';
-import { missingText } from '../game/data/demo-world';
+import { missingText } from '../game/data/world';
 import { STATUS, starString } from '../game/portal-status';
 import { Icon } from './Icon';
 

@@ -390,6 +390,19 @@ export const deletionRequests = sqliteTable('deletion_requests', {
   executeAt: ts('execute_at').notNull(),
 });
 
+/** [PB] Idempotency markers for one-time rewards (items from levels, achievements). */
+export const rewardClaims = sqliteTable(
+  'reward_claims',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    ref: text('ref').notNull(),
+    createdAt: ts('created_at').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.ref] })],
+);
+
 /** Technical key/value store (setup state, last job runs). */
 export const meta = sqliteTable('meta', {
   key: text('key').primaryKey(),

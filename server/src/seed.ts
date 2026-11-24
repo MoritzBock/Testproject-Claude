@@ -5,6 +5,7 @@ import { openDb } from './db/client.js';
 import { seedDemo } from './dev-seed.js';
 import { systemClock } from './lib/clock.js';
 import { loadAppKey } from './lib/crypto.js';
+import { loadContent } from './content/loader.js';
 
 const cfg = loadConfig();
 if (cfg.NODE_ENV === 'production') {
@@ -19,6 +20,7 @@ const deps = {
   cfg,
   clock: systemClock,
   appKey: loadAppKey(cfg.DATA_DIR, cfg.APP_SECRET),
+  content: loadContent(cfg.CONTENT_DIR),
 };
 const created = await seedDemo(deps);
 console.warn(created ? 'Demo-Daten angelegt.' : 'Datenbank ist nicht leer – nichts angelegt.');

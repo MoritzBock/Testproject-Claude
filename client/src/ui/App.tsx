@@ -4,15 +4,8 @@ import { getSettings } from '../core/settings-store';
 import { useStore } from '../core/store';
 import { input } from '../input/input';
 import { Caption, DialogBox, Hud, PortalInfoBox, Toasts, ZoneBanner } from './Hud';
-import {
-  Credits,
-  LevelPlaceholder,
-  Loading,
-  PauseMenu,
-  PrivacyInfo,
-  RotateHint,
-  TitleScreen,
-} from './Menus';
+import { Credits, Loading, PauseMenu, PrivacyInfo, RotateHint, TitleScreen } from './Menus';
+import { LevelView } from './LevelView';
 import { SettingsPanel } from './SettingsPanel';
 import { TouchControls } from './TouchControls';
 import { WorldMap } from './WorldMap';
@@ -71,7 +64,7 @@ export function App() {
       {overlay === 'map' && <WorldMap />}
       {overlay === 'privacy' && <PrivacyInfo />}
       {overlay === 'credits' && <Credits />}
-      {overlay === 'level' && <LevelPlaceholder />}
+      {overlay === 'level' && <LevelView />}
       {overlay === 'wardrobe' && <Wardrobe />}
       <RotateHint />
     </>

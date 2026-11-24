@@ -4,9 +4,6 @@ export interface BusEvents {
   toTitle: void;
   enterPortal: void;
   interact: void;
-  /** Demo only (until M4): finish the active level with n stars. */
-  demoCompleteLevel: { levelId: string; stars: number };
-  demoResetProgress: void;
   settingsChanged: void;
   levelClosed: void;
 }

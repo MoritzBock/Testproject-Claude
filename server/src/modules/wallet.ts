@@ -58,3 +58,11 @@ export function verifyLedger(deps: Deps, userId: string): boolean {
     .reduce((s, r) => s + r.a, 0);
   return sum === balance(deps, userId).balance;
 }
+
+export function registerWalletRoutes(app: import('fastify').FastifyInstance, deps: Deps): void {
+  app.get('/api/wallet', async (req) => {
+    const { requireReady } = await import('../auth/guards.js');
+    const u = requireReady(req, deps);
+    return balance(deps, u.id);
+  });
+}

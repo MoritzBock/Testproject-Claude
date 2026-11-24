@@ -1,0 +1,48 @@
+{
+  "id": "demo-b",
+  "title": "Demo B: Netzwerk-Basics",
+  "subject": "Platzhalter · Netzwerktechnik",
+  "description": "Platzhalter-Level. Wird nach Demo A freigeschaltet.",
+  "icon": "cave",
+  "requires": { "level": "demo-a" },
+  "tasks": [
+    {
+      "id": "ports",
+      "type": "match",
+      "prompt": "Ordne die Standard-Ports den Diensten zu.",
+      "pairs": [
+        { "left": "Port 22", "right": "SSH" },
+        { "left": "Port 53", "right": "DNS" },
+        { "left": "Port 80", "right": "HTTP" },
+        { "left": "Port 443", "right": "HTTPS" }
+      ],
+      "hints": ["HTTPS ist die verschlüsselte Variante von HTTP und hat die höhere Portnummer."],
+      "explanation": "22 SSH, 53 DNS, 80 HTTP, 443 HTTPS."
+    },
+    {
+      "id": "osi3",
+      "type": "cloze",
+      "prompt": "Wähle den passenden Begriff.",
+      "text": "Schicht 3 des OSI-Modells heißt {{s3}}.",
+      "gaps": {
+        "s3": {
+          "accepted": ["Vermittlungsschicht"],
+          "options": ["Bitübertragungsschicht", "Sicherungsschicht", "Transportschicht"]
+        }
+      },
+      "explanation": "Schicht 3 ist die Vermittlungsschicht (Network Layer), z. B. mit IP."
+    },
+    {
+      "id": "ipv4",
+      "type": "choice",
+      "prompt": "Welche Adresse ist eine gültige private IPv4-Adresse?",
+      "options": [
+        { "text": "192.168.1.20", "correct": true },
+        { "text": "8.8.8.8" },
+        { "text": "256.1.1.1" }
+      ],
+      "hints": ["Private Bereiche: 10.x.x.x, 172.16–31.x.x, 192.168.x.x"],
+      "explanation": "192.168.0.0/16 ist ein privater Bereich. 256 ist als Oktett ungültig."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "$comment": "Zonen der Hub-Welt und ihre Voraussetzungen. Die Zonen-IDs entsprechen den gateId/zoneId-Objekten der Karte.",
+  "zones": [
+    { "id": "campus", "label": "Campus-Platz" },
+    { "id": "platinenwald", "label": "Platinenwald" },
+    { "id": "datenstrand", "label": "Datenstrand", "requires": { "starsTotal": 3 } },
+    {
+      "id": "serverberg",
+      "label": "Serverberg",
+      "requires": { "all": [{ "level": "demo-a" }, { "level": "demo-b" }, { "level": "demo-c" }] }
+    }
+  ]
+}

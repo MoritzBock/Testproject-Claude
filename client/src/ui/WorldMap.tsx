@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import { closeOverlay } from '../core/app-state';
 import { appState } from '../core/app-state';
 import { useStore } from '../core/store';
-import { levelMeta, worldState } from '../game/data/demo-world';
+import { levelTitle, worldStore } from '../game/data/world';
 import { STATUS } from '../game/portal-status';
 import { portalMarkers, zoneRects } from '../game/scenes/HubScene';
 import { minimapCanvas } from '../game/systems/minimap';
@@ -23,7 +23,7 @@ export function WorldMap() {
   const w = minimapCanvas.width || 1;
   const h = minimapCanvas.height || 1;
   const pct = (x: number, y: number) => ({ left: `${(x / w) * 100}%`, top: `${(y / h) * 100}%` });
-  const world = worldState();
+  const world = useStore(worldStore, (w) => w.state) ?? { zones: {}, levels: {}, starsTotal: 0 };
 
   return (
     <Modal title="Weltkarte" onClose={closeOverlay} wide>
@@ -50,9 +50,9 @@ export function WorldMap() {
               key={m.levelId}
               class={`worldmap-portal status-icon ${st.className}`}
               style={pct(m.tx + 0.5, m.ty)}
-              title={`${levelMeta(m.levelId).title} – ${st.label}`}
+              title={`${levelTitle(m.levelId)} – ${st.label}`}
             >
-              <Icon name={st.icon} label={`${levelMeta(m.levelId).title}: ${st.label}`} />
+              <Icon name={st.icon} label={`${levelTitle(m.levelId)}: ${st.label}`} />
             </span>
           );
         })}
