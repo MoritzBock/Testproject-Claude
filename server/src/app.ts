@@ -24,6 +24,7 @@ import { seedDemo, DEMO } from './dev-seed.js';
 import { loadContent } from './content/loader.js';
 import { registerLevelRoutes } from './modules/levels.js';
 import { registerWalletRoutes } from './modules/wallet.js';
+import { registerEconomyRoutes } from './modules/economy.js';
 
 export const VERSION = '0.2.0';
 
@@ -124,6 +125,7 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   registerCharacterRoutes(app, deps);
   registerLevelRoutes(app, deps);
   registerWalletRoutes(app, deps);
+  registerEconomyRoutes(app, deps);
 
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/'))

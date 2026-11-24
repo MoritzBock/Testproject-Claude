@@ -61,7 +61,7 @@ export const LAYOUT = {
       y: 29,
       lines: [
         'Hallo! Ich bin Bit-Bert vom Byte-Basar.',
-        'Mein Laden öffnet bald – sammle schon mal fleißig Bytes!',
+        'Hier im Byte-Basar tauschst du deine Bytes gegen neue Kleidung.',
       ],
     },
     {

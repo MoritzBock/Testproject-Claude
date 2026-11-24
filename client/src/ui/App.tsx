@@ -12,6 +12,7 @@ import { WorldMap } from './WorldMap';
 import { bus } from '../core/bus';
 import { LoginScreen } from './Login';
 import { Wardrobe } from './Wardrobe';
+import { Shop } from './Shop';
 import { Onboarding } from './Onboarding';
 import './ui.css';
 
@@ -66,6 +67,7 @@ export function App() {
       {overlay === 'credits' && <Credits />}
       {overlay === 'level' && <LevelView />}
       {overlay === 'wardrobe' && <Wardrobe />}
+      {overlay === 'shop' && <Shop />}
       <RotateHint />
     </>
   );

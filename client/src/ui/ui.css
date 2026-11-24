@@ -1199,3 +1199,101 @@ legend {
 .rewards li {
   margin: 0.3rem 0;
 }
+
+/* --- shop ------------------------------------------------------------------------------ */
+.shop-balance {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  font-weight: 700;
+}
+.shop-balance .icon-wrap {
+  color: var(--accent);
+}
+.shop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  border: 2px solid;
+  border-radius: 6px;
+  background: #0e1222;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.shop-grid {
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+}
+.box-card {
+  margin-bottom: 0.75rem;
+}
+.box-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.chances {
+  border-collapse: collapse;
+  margin: 0.25rem 0;
+}
+.chances caption {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.chances th,
+.chances td {
+  text-align: left;
+  padding: 0.15rem 0.75rem 0.15rem 0;
+}
+.reveal {
+  position: absolute;
+  inset: 0;
+  background: #070a16e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  border-radius: 8px;
+}
+.reveal-box {
+  width: 5rem;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: #1f6f6a;
+  border: 4px solid var(--accent);
+  border-radius: 8px;
+  animation: shake 0.4s infinite;
+}
+.reveal-item {
+  position: relative;
+  border: 4px solid;
+  border-radius: 8px;
+  padding: 0.5rem;
+  animation: pop-in 0.35s ease-out;
+}
+.reveal-item .item-thumb {
+  width: 96px;
+  height: 144px;
+}
+.modal {
+  position: relative;
+}
+@keyframes shake {
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}

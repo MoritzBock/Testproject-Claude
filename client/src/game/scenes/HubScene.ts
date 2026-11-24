@@ -506,6 +506,11 @@ export class HubScene extends Phaser.Scene {
     const portal = this.nearestPortal();
     if (portal) return this.enterPortal(portal);
     const npc = this.nearestNpc();
+    if (npc?.id === 'bert') {
+      playSfx('talk');
+      openOverlay('shop');
+      return;
+    }
     if (npc) {
       // turn towards the player
       const dx = this.player.x - npc.sprite.x;
