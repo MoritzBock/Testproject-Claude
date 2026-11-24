@@ -42,6 +42,12 @@ export async function proceed(): Promise<void> {
   }
   await loadAccountData();
   appState.set({ overlay: null });
+  if (m.deletionRequestedFor)
+    notify(
+      `Dein Konto wird am ${new Date(m.deletionRequestedFor).toLocaleDateString('de-DE')} gelöscht (unter „Meine Daten“ zurücknehmbar).`,
+      'warning',
+      8000,
+    );
   bus.emit('startGame');
   const { connectRealtime } = await import('../net/realtime');
   connectRealtime();

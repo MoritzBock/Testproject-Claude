@@ -13,6 +13,7 @@ import { bus } from '../core/bus';
 import { LoginScreen } from './Login';
 import { Wardrobe } from './Wardrobe';
 import { Shop } from './Shop';
+import { MyData } from './MyData';
 import { AdminConsole, AnnouncementBanner, EmoteMenu, FrozenBanner, Leaderboard } from './Social';
 import { Onboarding } from './Onboarding';
 import './ui.css';
@@ -74,6 +75,7 @@ export function App() {
       {overlay === 'level' && <LevelView />}
       {overlay === 'wardrobe' && <Wardrobe />}
       {overlay === 'shop' && <Shop />}
+      {overlay === 'mydata' && <MyData />}
       {overlay === 'emotes' && <EmoteMenu />}
       {overlay === 'leaderboard' && <Leaderboard />}
       {overlay === 'console' && (

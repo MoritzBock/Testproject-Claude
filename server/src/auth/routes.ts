@@ -10,8 +10,8 @@ import {
   type MeResponse,
 } from '@pixel/shared';
 import type { Deps } from '../deps.js';
-import { characters, classes, meta, users } from '../db/schema.js';
-import { MINUTE } from '../lib/clock.js';
+import { characters, classes, deletionRequests, meta, users } from '../db/schema.js';
+import { DAY, MINUTE } from '../lib/clock.js';
 import { decryptSecret, encryptSecret, randomToken, sha256 } from '../lib/crypto.js';
 import { HttpError, conflict, forbidden, parse } from '../lib/http-error.js';
 import { dummyHash, hashPassword, verifyPassword } from '../lib/passwords.js';
@@ -50,6 +50,11 @@ export function buildMe(deps: Deps, userId: string): MeResponse {
     totpEnabled: u.totpEnabled,
     totpSetupRequired: deps.cfg.REQUIRE_STAFF_2FA && u.role !== 'student' && !u.totpEnabled,
     hasCharacter: u.role !== 'student' || hasCharacter,
+    deletionDueAt:
+      u.role === 'student' ? u.lastActiveAt + deps.cfg.RETENTION_INACTIVE_DAYS * DAY : null,
+    deletionRequestedFor:
+      deps.db.select().from(deletionRequests).where(eq(deletionRequests.userId, u.id)).get()
+        ?.executeAt ?? null,
   };
 }
 

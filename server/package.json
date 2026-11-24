@@ -8,7 +8,8 @@
     "build": "tsc -p .",
     "start": "node dist/main.js",
     "db:generate": "drizzle-kit generate",
-    "seed": "tsx --conditions=development --env-file-if-exists=../.env src/seed.ts"
+    "seed": "tsx --conditions=development --env-file-if-exists=../.env src/seed.ts",
+    "backup": "node dist/tools/backup.js"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.5",

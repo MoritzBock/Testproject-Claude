@@ -30,6 +30,8 @@ import { Presence } from './realtime/presence.js';
 import { registerConsoleRoutes } from './modules/console.js';
 import { registerDashboardRoutes } from './modules/dashboard.js';
 import { registerLeaderboardRoutes } from './modules/leaderboard.js';
+import { registerPrivacyRoutes } from './modules/privacy.js';
+import { scheduleRetention } from './jobs/retention.js';
 
 export const VERSION = '0.2.0';
 
@@ -137,6 +139,7 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
   registerConsoleRoutes(app, deps);
   registerDashboardRoutes(app, deps);
   registerLeaderboardRoutes(app, deps);
+  registerPrivacyRoutes(app, deps);
 
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/'))
@@ -162,7 +165,11 @@ export async function buildApp(cfg: Config, opts: BuildOptions = {}): Promise<Fa
     }
   }
 
-  if (!isTest) deps.presence.attach(app);
+  if (!isTest) {
+    deps.presence.attach(app);
+    const stop = scheduleRetention(deps, (msg, r) => app.log.info({ retention: r }, msg));
+    app.addHook('onClose', async () => stop());
+  }
 
   // --- first start ------------------------------------------------------------------
   if (cfg.NODE_ENV === 'development' && cfg.DEV_SEED && (await seedDemo(deps))) {

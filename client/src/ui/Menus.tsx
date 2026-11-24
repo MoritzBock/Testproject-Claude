@@ -81,6 +81,9 @@ export function PauseMenu() {
         <button class="btn" onClick={() => openSettings()}>
           Einstellungen
         </button>
+        <button class="btn" onClick={() => openOverlay('mydata')}>
+          Meine Daten
+        </button>
         <button class="btn" onClick={() => openOverlay('privacy')}>
           Datenschutz
         </button>

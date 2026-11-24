@@ -47,6 +47,9 @@ export interface MeResponse {
   totpEnabled: boolean;
   totpSetupRequired: boolean;
   hasCharacter: boolean;
+  /** Learners: date of automatic deletion (inactivity) and a pending own deletion request. */
+  deletionDueAt: number | null;
+  deletionRequestedFor: number | null;
 }
 
 /** API error codes the client reacts to. */

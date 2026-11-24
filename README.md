@@ -6,7 +6,7 @@ Das System ist datensparsam gebaut (Pseudonyme statt Klarnamen, keine externen D
 
 > **Hinweis:** Die Lernstandsdaten dienen der Lernbegleitung und nicht der Notengebung.
 
-Stand: **Meilenstein M1 (Hub-Welt)**. Der Fahrplan steht in [`docs/PLAN.md`](docs/PLAN.md).
+Stand: **Meilenstein M7 (Datenschutz-Abschluss)**. Der Fahrplan steht in [`docs/PLAN.md`](docs/PLAN.md).
 
 ---
 
@@ -121,11 +121,25 @@ Vor jedem Update ein Backup anlegen (siehe unten). Ab M2 laufen Datenbank-Migrat
 
 ## 5. Backup
 
-> Die Skripte `scripts/backup.sh` und `scripts/restore.sh` kommen mit M7: konsistentes SQLite-Backup,
-> Verschlüsselung mit `age` und Rotation nach 30 Tagen. Backups gehören **außerhalb** der VM, denn Oracle
-> kann ungenutzte Always-Free-Instanzen zurückfordern.
+Verschlüsselte, konsistente Backups mit Rotation (30 Tage):
 
-Bis dahin liegen die Daten im Docker-Volume `app-data` (`/data` im Container).
+1. `age` auf dem Server installieren (`apt install age`).
+2. Auf Ihrem **eigenen** Rechner ein Schlüsselpaar erzeugen: `age-keygen -o pixel-backup-key.txt`.
+   Die Datei (privater Schlüssel) bleibt offline.
+3. Den öffentlichen Schlüssel (`age1…`) in `.env` als `BACKUP_AGE_RECIPIENT` eintragen.
+4. Backup ausführen bzw. per Cron täglich:
+
+   ```bash
+   scripts/backup.sh
+   ```
+
+Wiederherstellen:
+
+```bash
+scripts/restore.sh backups/pixel-JJJJMMTT-HHMMSS.db.age /pfad/zu/pixel-backup-key.txt
+```
+
+Backups gehören zusätzlich **außerhalb** der VM, denn Oracle kann ungenutzte Always-Free-Instanzen zurückfordern.
 
 ## 6. Sicherheit & Abhängigkeiten
 
